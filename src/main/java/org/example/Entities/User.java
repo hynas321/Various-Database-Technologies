@@ -1,6 +1,6 @@
 package org.example.Entities;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,8 +17,16 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Post> posts = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_boards",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "board_id")
+    )
+    private Set<Board> boards = new HashSet<>();
 
     public User() {}
 
@@ -57,5 +65,13 @@ public class User {
 
     public void setPosts(Set<Post> posts) {
         this.posts = posts;
+    }
+
+    public Set<Board> getBoards() {
+        return boards;
+    }
+
+    public void setBoards(Set<Board> boards) {
+        this.boards = boards;
     }
 }

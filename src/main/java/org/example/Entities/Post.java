@@ -1,6 +1,6 @@
 package org.example.Entities;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +16,7 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private User creator;
 
     @ManyToOne
     @JoinColumn(name = "board_id", nullable = false)
@@ -27,9 +27,9 @@ public class Post {
 
     public Post() {}
 
-    public Post(String content, User user, Board board) {
+    public Post(String content, User creator, Board board) {
         this.content = content;
-        this.user = user;
+        this.creator = creator;
         this.board = board;
     }
 
@@ -49,12 +49,12 @@ public class Post {
         this.content = content;
     }
 
-    public User getUser() {
-        return user;
+    public User getCreator() {
+        return creator;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setCreator(User creator) {
+        this.creator = creator;
     }
 
     public Board getBoard() {

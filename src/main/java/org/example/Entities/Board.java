@@ -1,6 +1,6 @@
 package org.example.Entities;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +18,7 @@ public class Board {
     private Set<Post> posts = new HashSet<>();
 
     @ManyToMany(mappedBy = "boards")
-    private Set<User> users = new HashSet<>();
+    private Set<User> members = new HashSet<>();
 
     public Board() {}
 
@@ -50,11 +50,11 @@ public class Board {
         this.posts = posts;
     }
 
-    public Set<User> getUsers() {
-        return users;
+    public Set<User> getMembers() {
+        return members;
     }
 
-    public void setUsers(Set<User> users) {
-        this.users = users;
+    public void setMembers(Set<User> members) {
+        this.members = members;
     }
 }

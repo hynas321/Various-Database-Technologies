@@ -24,13 +24,19 @@ public class BoardService implements IBoardService {
     }
 
     @Override
-    public void deleteBoard(Long boardId) {
+    public void deleteBoard(Long boardId, Long userId) {
         Board board = boardRepository.getById(boardId);
-        if (board != null) {
-            boardRepository.delete(board);
-        } else {
+        User user = userRepository.getById(userId);
+
+        if (board == null) {
             throw new IllegalArgumentException("Board not found.");
         }
+
+        if (user == null || !board.getMembers().contains(user)) {
+            throw new IllegalArgumentException("User is not a member of this board.");
+        }
+
+        boardRepository.delete(board);
     }
 
     @Override
@@ -57,7 +63,7 @@ public class BoardService implements IBoardService {
             throw new IllegalArgumentException("Board or User not found.");
         }
 
-        board.getUsers().add(user);
+        board.getMembers().add(user);
         boardRepository.update(board);
     }
 
@@ -70,7 +76,7 @@ public class BoardService implements IBoardService {
             throw new IllegalArgumentException("Board or User not found.");
         }
 
-        board.getUsers().remove(user);
+        board.getMembers().remove(user);
         boardRepository.update(board);
     }
 }

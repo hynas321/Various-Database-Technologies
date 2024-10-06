@@ -28,25 +28,32 @@ public class PostService implements IPostService {
             throw new IllegalArgumentException("User or Board not found.");
         }
 
-        if (!board.getUsers().contains(user)) {
+        if (!board.getMembers().contains(user)) {
             throw new IllegalArgumentException("User is not a member of this board.");
         }
 
         Post post = new Post(content, user, board);
         postRepository.create(post);
 
+        board.getPosts().add(post);
+        boardRepository.update(board);
+
         return post;
     }
 
     @Override
-    public void deletePost(Long postId) {
+    public void deletePost(Long postId, Long userId) {
         Post post = postRepository.getById(postId);
 
-        if (post != null) {
-            postRepository.delete(post);
-        } else {
+        if (post == null) {
             throw new IllegalArgumentException("Post not found.");
         }
+
+        if (!post.getCreator().getId().equals(userId)) {
+            throw new IllegalArgumentException("Only the post owner can delete the post.");
+        }
+
+        postRepository.delete(post);
     }
 
     @Override
@@ -60,7 +67,18 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public void updatePost(Post post) {
-        postRepository.update(post);
+    public void updatePost(Post post, Long userId) {
+        Post existingPost = postRepository.getById(post.getId());
+
+        if (existingPost == null) {
+            throw new IllegalArgumentException("Post not found.");
+        }
+
+        if (!existingPost.getCreator().getId().equals(userId)) {
+            throw new IllegalArgumentException("Only the post owner can update the post.");
+        }
+
+        existingPost.setContent(post.getContent());
+        postRepository.update(existingPost);
     }
 }

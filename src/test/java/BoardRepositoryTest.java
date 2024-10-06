@@ -1,5 +1,3 @@
-package org.example;
-
 import org.example.Entities.Board;
 import org.example.Repositories.BoardRepository;
 import org.junit.jupiter.api.Assertions;

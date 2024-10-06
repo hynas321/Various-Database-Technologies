@@ -1,6 +1,6 @@
 package org.example.Entities;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "comments")
@@ -16,11 +16,16 @@ public class Comment {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User creator;
+
     public Comment() {}
 
-    public Comment(String content, Post post) {
+    public Comment(String content, Post post, User creator) {
         this.content = content;
         this.post = post;
+        this.creator = creator;
     }
 
     public Long getId() {
@@ -45,5 +50,13 @@ public class Comment {
 
     public void setPost(Post post) {
         this.post = post;
+    }
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
     }
 }

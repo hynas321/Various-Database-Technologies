@@ -3,13 +3,14 @@ package org.example.Services.Interfaces;
 import org.example.Entities.Board;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IBoardService {
-    Board createBoard(String name);
-    void deleteBoard(Long boardId, Long userId);
-    Board getBoardById(Long boardId);
+    Optional<Board> createBoard(String name);
+    boolean deleteBoard(Long boardId, Long userId);
+    boolean updateBoard(Board board);
+    Optional<Board> getBoardById(Long boardId);
     List<Board> getAllBoards();
-    void updateBoard(Board board);
-    void addUserToBoard(Long boardId, Long userId);
-    void removeUserFromBoard(Long boardId, Long userId);
+    boolean addUserToBoard(Long boardId, Long userId);
+    boolean removeUserFromBoard(Long boardId, Long userId);
 }

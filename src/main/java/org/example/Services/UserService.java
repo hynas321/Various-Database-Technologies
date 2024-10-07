@@ -1,50 +1,77 @@
 package org.example.Services;
 
 import org.example.Entities.User;
-import org.example.Repositories.Interfaces.GenericRepository;
+import org.example.Repositories.Interfaces.EntityRepository;
 import org.example.Services.Interfaces.IUserService;
 
 import java.util.List;
+import java.util.Optional;
 
 public class UserService implements IUserService {
-    private final GenericRepository<User> userRepository;
+    private final EntityRepository<User> userRepository;
 
-    public UserService(GenericRepository<User> userRepository) {
+    public UserService(EntityRepository<User> userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
-    public User register(String email, String password) {
-        if (userRepository.getAll().stream().anyMatch(user -> user.getEmail().equals(email))) {
-            throw new IllegalArgumentException("User already exists with this email.");
+    public boolean createUser(String email, String password) {
+        if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
+            return false;
         }
 
-        User newUser = new User(email, password);
-        userRepository.create(newUser);
+        if (userRepository.getAll().stream().anyMatch(u -> u.getEmail().equals(email))) {
+            return false;
+        }
 
-        return newUser;
+        User user = new User(email, password);
+        userRepository.create(user);
+        return true;
     }
 
     @Override
-    public User login(String email, String password) {
-        return userRepository.getAll().stream()
-                .filter(u -> u.getEmail().equals(email) && u.getPassword().equals(password))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
+    public boolean deleteUser(Long userId) {
+        if (userId == null) {
+            return false;
+        }
+
+        User user = userRepository.getById(userId);
+
+        if (user == null) {
+            return false;
+        }
+
+        userRepository.delete(user);
+        return true;
     }
 
     @Override
-    public User getUserById(Long userId) {
-        return userRepository.getById(userId);
+    public boolean updateUser(User user) {
+        if (user == null || user.getId() == null) {
+            return false;
+        }
+
+        User existingUser = userRepository.getById(user.getId());
+
+        if (existingUser == null) {
+            return false;
+        }
+
+        userRepository.update(user);
+        return true;
+    }
+
+    @Override
+    public Optional<User> getUserById(Long userId) {
+        if (userId == null) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(userRepository.getById(userId));
     }
 
     @Override
     public List<User> getAllUsers() {
         return userRepository.getAll();
-    }
-
-    @Override
-    public void updateUser(User user) {
-        userRepository.update(user);
     }
 }

@@ -3,11 +3,12 @@ package org.example.Services.Interfaces;
 import org.example.Entities.Post;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IPostService {
-    Post createPost(Long userId, Long boardId, String content);
-    void deletePost(Long postId, Long userId);
-    Post getPostById(Long postId);
+    Optional<Post> createPost(Long userId, Long boardId, String content);
+    boolean deletePost(Long postId, Long userId);
+    boolean updatePost(Post post, Long userId);
+    Optional<Post> getPostById(Long postId);
     List<Post> getAllPosts();
-    void updatePost(Post post, Long userId);
 }

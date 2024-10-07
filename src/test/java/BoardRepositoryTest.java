@@ -1,61 +1,98 @@
 import org.example.Entities.Board;
+import org.example.Entities.Post;
+import org.example.Entities.User;
 import org.example.Repositories.BoardRepository;
-import org.junit.jupiter.api.Assertions;
+import org.example.Repositories.Interfaces.EntityRepository;
+import org.example.Repositories.PostRepository;
+import org.example.Repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class BoardRepositoryTest extends BaseRepositoryTest {
-    private BoardRepository boardRepository;
+import static org.junit.jupiter.api.Assertions.*;
+
+class BoardRepositoryTest extends BaseRepositoryTest {
+
+    private EntityRepository<Board> boardRepository;
+    private EntityRepository<User> userRepository;
 
     @BeforeEach
+    @Override
     public void setUp() {
         super.setUp();
         boardRepository = new BoardRepository(session);
+        userRepository = new UserRepository(session);
     }
 
     @Test
-    public void testCreateAndGetById() {
+    void create_ShouldSaveBoard() {
         Board board = new Board("Test Board");
         boardRepository.create(board);
 
         Board retrievedBoard = boardRepository.getById(board.getId());
-        Assertions.assertNotNull(retrievedBoard);
-        Assertions.assertEquals("Test Board", retrievedBoard.getName());
+        assertNotNull(retrievedBoard);
+        assertEquals("Test Board", retrievedBoard.getName());
     }
 
     @Test
-    public void testGetAll() {
+    void getById_ShouldReturnBoard() {
+        Board board = new Board("Another Board");
+        boardRepository.create(board);
+
+        Board retrievedBoard = boardRepository.getById(board.getId());
+        assertNotNull(retrievedBoard);
+        assertEquals("Another Board", retrievedBoard.getName());
+    }
+
+    @Test
+    void getAll_ShouldReturnListOfBoards() {
         Board board1 = new Board("Board 1");
         Board board2 = new Board("Board 2");
+
         boardRepository.create(board1);
         boardRepository.create(board2);
 
         List<Board> boards = boardRepository.getAll();
-        Assertions.assertEquals(2, boards.size());
+        assertEquals(2, boards.size());
     }
 
     @Test
-    public void testUpdate() {
-        Board board = new Board("Initial Name");
+    void update_ShouldUpdateBoard() {
+        Board board = new Board("Original Board Name");
         boardRepository.create(board);
 
-        board.setName("Updated Name");
+        board.setName("Updated Board Name");
         boardRepository.update(board);
 
         Board updatedBoard = boardRepository.getById(board.getId());
-        Assertions.assertEquals("Updated Name", updatedBoard.getName());
+        assertEquals("Updated Board Name", updatedBoard.getName());
     }
 
     @Test
-    public void testDelete() {
-        Board board = new Board("To Be Deleted");
+    void delete_ShouldDeleteBoard() {
+        Board board = new Board("Board to delete");
         boardRepository.create(board);
 
         boardRepository.delete(board);
-        Board deletedBoard = boardRepository.getById(board.getId());
 
-        Assertions.assertNull(deletedBoard);
+        Board deletedBoard = boardRepository.getById(board.getId());
+        assertNull(deletedBoard);
+    }
+
+    @Test
+    void create_ShouldSaveBoardWithPosts() {
+        User user = new User("user6@example.com", "password123");
+        userRepository.create(user);
+
+        Board board = new Board("Board with Posts");
+        Post post = new Post("Post in Board", user, board);
+        board.getPosts().add(post);
+
+        boardRepository.create(board);
+
+        Board retrievedBoard = boardRepository.getById(board.getId());
+        assertNotNull(retrievedBoard);
+        assertEquals(1, retrievedBoard.getPosts().size());
     }
 }

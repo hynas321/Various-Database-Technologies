@@ -1,15 +1,14 @@
 package org.example.Services.Interfaces;
 
-import org.example.Entities.Board;
 import org.example.Entities.User;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 public interface IUserService {
-    User register(String email, String password);
-    User login(String email, String password);
-    User getUserById(Long userId);
+    boolean createUser(String email, String password);
+    boolean deleteUser(Long userId);
+    boolean updateUser(User user);
+    Optional<User> getUserById(Long userId);
     List<User> getAllUsers();
-    void updateUser(User user);
 }

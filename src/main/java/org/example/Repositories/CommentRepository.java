@@ -1,14 +1,15 @@
 package org.example.Repositories;
 
+import jakarta.persistence.OptimisticLockException;
 import org.example.Entities.Comment;
-import org.example.Repositories.Interfaces.GenericRepository;
+import org.example.Repositories.Interfaces.EntityRepository;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import java.util.List;
 
-public class CommentRepository implements GenericRepository<Comment> {
+public class CommentRepository implements EntityRepository<Comment> {
     private final Session session;
 
     public CommentRepository(Session session) {
@@ -17,9 +18,13 @@ public class CommentRepository implements GenericRepository<Comment> {
 
     @Override
     public void create(Comment comment) {
-        Transaction transaction = session.beginTransaction();
-        session.save(comment);
-        transaction.commit();
+        try {
+            Transaction transaction = session.beginTransaction();
+            session.save(comment);
+            transaction.commit();
+        } catch (OptimisticLockException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -35,15 +40,23 @@ public class CommentRepository implements GenericRepository<Comment> {
 
     @Override
     public void update(Comment comment) {
-        Transaction transaction = session.beginTransaction();
-        session.update(comment);
-        transaction.commit();
+        try {
+            Transaction transaction = session.beginTransaction();
+            session.update(comment);
+            transaction.commit();
+        } catch (OptimisticLockException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void delete(Comment comment) {
-        Transaction transaction = session.beginTransaction();
-        session.delete(comment);
-        transaction.commit();
+        try {
+            Transaction transaction = session.beginTransaction();
+            session.delete(comment);
+            transaction.commit();
+        } catch (OptimisticLockException e) {
+            e.printStackTrace();
+        }
     }
 }

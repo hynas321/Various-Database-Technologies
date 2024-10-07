@@ -1,14 +1,15 @@
 package org.example.Repositories;
 
+import jakarta.persistence.OptimisticLockException;
 import org.example.Entities.User;
-import org.example.Repositories.Interfaces.GenericRepository;
+import org.example.Repositories.Interfaces.EntityRepository;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import java.util.List;
 
-public class UserRepository implements GenericRepository<User> {
+public class UserRepository implements EntityRepository<User> {
     private final Session session;
 
     public UserRepository(Session session) {
@@ -17,9 +18,13 @@ public class UserRepository implements GenericRepository<User> {
 
     @Override
     public void create(User user) {
-        Transaction transaction = session.beginTransaction();
-        session.save(user);
-        transaction.commit();
+        try {
+            Transaction transaction = session.beginTransaction();
+            session.save(user);
+            transaction.commit();
+        } catch (OptimisticLockException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -35,15 +40,23 @@ public class UserRepository implements GenericRepository<User> {
 
     @Override
     public void update(User user) {
-        Transaction transaction = session.beginTransaction();
-        session.update(user);
-        transaction.commit();
+        try {
+            Transaction transaction = session.beginTransaction();
+            session.update(user);
+            transaction.commit();
+        } catch (OptimisticLockException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void delete(User user) {
-        Transaction transaction = session.beginTransaction();
-        session.delete(user);
-        transaction.commit();
+        try {
+            Transaction transaction = session.beginTransaction();
+            session.delete(user);
+            transaction.commit();
+        } catch (OptimisticLockException e) {
+            e.printStackTrace();
+        }
     }
 }

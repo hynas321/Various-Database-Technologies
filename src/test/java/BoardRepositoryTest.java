@@ -5,6 +5,7 @@ import org.example.Repositories.BoardRepository;
 import org.example.Repositories.Interfaces.EntityRepository;
 import org.example.Repositories.PostRepository;
 import org.example.Repositories.UserRepository;
+import org.hibernate.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -95,4 +96,50 @@ class BoardRepositoryTest extends BaseRepositoryTest {
         assertNotNull(retrievedBoard);
         assertEquals(1, retrievedBoard.getPosts().size());
     }
+
+    @Test
+    void versionField_ShouldIncrementOnEachUpdate_ForBoard() {
+        Session createSession = sessionFactory.openSession();
+        createSession.beginTransaction();
+        Board board = new Board("Board for Version Test");
+        boardRepository.create(board);
+        createSession.getTransaction().commit();
+        createSession.close();
+
+        Session session1 = sessionFactory.openSession();
+        session1.beginTransaction();
+        Board retrievedBoard = session1.get(Board.class, board.getId());
+        int initialVersion = retrievedBoard.getVersion();
+        session1.getTransaction().commit();
+        session1.close();
+
+        Session session2 = sessionFactory.openSession();
+        session2.beginTransaction();
+        retrievedBoard.setName("Updated by first transaction");
+        session2.merge(retrievedBoard);
+        session2.getTransaction().commit();
+
+        session2.beginTransaction();
+        Board updatedBoard = session2.get(Board.class, retrievedBoard.getId());
+        int firstUpdatedVersion = updatedBoard.getVersion();
+        session2.getTransaction().commit();
+        session2.close();
+
+        assertTrue(firstUpdatedVersion > initialVersion, "Version should increment after the first update");
+
+        Session session3 = sessionFactory.openSession();
+        session3.beginTransaction();
+        updatedBoard.setName("Updated by second transaction");
+        session3.merge(updatedBoard);
+        session3.getTransaction().commit();
+
+        session3.beginTransaction();
+        Board secondUpdatedBoard = session3.get(Board.class, updatedBoard.getId());
+        int secondUpdatedVersion = secondUpdatedBoard.getVersion();
+        session3.getTransaction().commit();
+        session3.close();
+
+        assertTrue(secondUpdatedVersion > firstUpdatedVersion, "Version should increment after the second update");
+    }
+
 }

@@ -7,6 +7,7 @@ import org.example.Repositories.CommentRepository;
 import org.example.Repositories.Interfaces.EntityRepository;
 import org.example.Repositories.PostRepository;
 import org.example.Repositories.UserRepository;
+import org.hibernate.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -131,5 +132,59 @@ class CommentRepositoryTest extends BaseRepositoryTest {
 
         Comment deletedComment = commentRepository.getById(comment.getId());
         assertNull(deletedComment);
+    }
+
+    @Test
+    void versionField_ShouldIncrementOnEachUpdate_ForComment() {
+        Session createSession = sessionFactory.openSession();
+        createSession.beginTransaction();
+        User user = new User("version_test_user@example.com", "password123");
+        userRepository.create(user);
+
+        Board board = new Board("Board for Version Test");
+        boardRepository.create(board);
+
+        Post post = new Post("Post for Versioning", user, board);
+        postRepository.create(post);
+
+        Comment comment = new Comment("Initial comment", post, user);
+        commentRepository.create(comment);
+        createSession.getTransaction().commit();
+        createSession.close();
+
+        Session session1 = sessionFactory.openSession();
+        session1.beginTransaction();
+        Comment retrievedComment = session1.get(Comment.class, comment.getId());
+        int initialVersion = retrievedComment.getVersion();
+        session1.getTransaction().commit();
+        session1.close();
+
+        Session session2 = sessionFactory.openSession();
+        session2.beginTransaction();
+        retrievedComment.setContent("Updated by first transaction");
+        session2.merge(retrievedComment);
+        session2.getTransaction().commit();
+
+        session2.beginTransaction();
+        Comment updatedComment = session2.get(Comment.class, retrievedComment.getId());
+        int firstUpdatedVersion = updatedComment.getVersion();
+        session2.getTransaction().commit();
+        session2.close();
+
+        assertTrue(firstUpdatedVersion > initialVersion, "Version should increment after the first update");
+
+        Session session3 = sessionFactory.openSession();
+        session3.beginTransaction();
+        updatedComment.setContent("Updated by second transaction");
+        session3.merge(updatedComment);
+        session3.getTransaction().commit();
+
+        session3.beginTransaction();
+        Comment secondUpdatedComment = session3.get(Comment.class, updatedComment.getId());
+        int secondUpdatedVersion = secondUpdatedComment.getVersion();
+        session3.getTransaction().commit();
+        session3.close();
+
+        assertTrue(secondUpdatedVersion > firstUpdatedVersion, "Version should increment after the second update");
     }
 }

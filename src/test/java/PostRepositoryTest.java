@@ -5,6 +5,7 @@ import org.example.Repositories.BoardRepository;
 import org.example.Repositories.Interfaces.EntityRepository;
 import org.example.Repositories.PostRepository;
 import org.example.Repositories.UserRepository;
+import org.hibernate.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -113,4 +114,56 @@ class PostRepositoryTest extends BaseRepositoryTest {
         Post deletedPost = postRepository.getById(post.getId());
         assertNull(deletedPost);
     }
+
+    @Test
+    void versionField_ShouldIncrementOnEachUpdate_ForPost() {
+        Session createSession = sessionFactory.openSession();
+        createSession.beginTransaction();
+        User user = new User("version_test_user_1@example.com", "password123");
+        userRepository.create(user);
+
+        Board board = new Board("Board for Post Version Test");
+        boardRepository.create(board);
+
+        Post post = new Post("Post for Versioning", user, board);
+        postRepository.create(post);
+        createSession.getTransaction().commit();
+        createSession.close();
+
+        Session session1 = sessionFactory.openSession();
+        session1.beginTransaction();
+        Post retrievedPost = session1.get(Post.class, post.getId());
+        int initialVersion = retrievedPost.getVersion();
+        session1.getTransaction().commit();
+        session1.close();
+
+        Session session2 = sessionFactory.openSession();
+        session2.beginTransaction();
+        retrievedPost.setContent("Updated by first transaction");
+        session2.merge(retrievedPost);
+        session2.getTransaction().commit();
+
+        session2.beginTransaction();
+        Post updatedPost = session2.get(Post.class, retrievedPost.getId());
+        int firstUpdatedVersion = updatedPost.getVersion();
+        session2.getTransaction().commit();
+        session2.close();
+
+        assertTrue(firstUpdatedVersion > initialVersion, "Version should increment after the first update");
+
+        Session session3 = sessionFactory.openSession();
+        session3.beginTransaction();
+        updatedPost.setContent("Updated by second transaction");
+        session3.merge(updatedPost);
+        session3.getTransaction().commit();
+
+        session3.beginTransaction();
+        Post secondUpdatedPost = session3.get(Post.class, updatedPost.getId());
+        int secondUpdatedVersion = secondUpdatedPost.getVersion();
+        session3.getTransaction().commit();
+        session3.close();
+
+        assertTrue(secondUpdatedVersion > firstUpdatedVersion, "Version should increment after the second update");
+    }
+
 }

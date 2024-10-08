@@ -75,4 +75,50 @@ class UserRepositoryTest extends BaseRepositoryTest {
         User deletedUser = userRepository.getById(user.getId());
         assertNull(deletedUser);
     }
+
+    @Test
+    void versionField_ShouldIncrementOnEachUpdate_ForUser() {
+        Session createSession = sessionFactory.openSession();
+        createSession.beginTransaction();
+        User user = new User("version_test_user_2@example.com", "password123");
+        userRepository.create(user);
+        createSession.getTransaction().commit();
+        createSession.close();
+
+        Session session1 = sessionFactory.openSession();
+        session1.beginTransaction();
+        User retrievedUser = session1.get(User.class, user.getId());
+        int initialVersion = retrievedUser.getVersion();
+        session1.getTransaction().commit();
+        session1.close();
+
+        Session session2 = sessionFactory.openSession();
+        session2.beginTransaction();
+        retrievedUser.setEmail("updated_user@example.com");
+        session2.merge(retrievedUser);
+        session2.getTransaction().commit();
+
+        session2.beginTransaction();
+        User updatedUser = session2.get(User.class, retrievedUser.getId());
+        int firstUpdatedVersion = updatedUser.getVersion();
+        session2.getTransaction().commit();
+        session2.close();
+
+        assertTrue(firstUpdatedVersion > initialVersion, "Version should increment after the first update");
+
+        Session session3 = sessionFactory.openSession();
+        session3.beginTransaction();
+        updatedUser.setEmail("updated_user_second@example.com");
+        session3.merge(updatedUser);
+        session3.getTransaction().commit();
+
+        session3.beginTransaction();
+        User secondUpdatedUser = session3.get(User.class, updatedUser.getId());
+        int secondUpdatedVersion = secondUpdatedUser.getVersion();
+        session3.getTransaction().commit();
+        session3.close();
+
+        assertTrue(secondUpdatedVersion > firstUpdatedVersion, "Version should increment after the second update");
+    }
+
 }

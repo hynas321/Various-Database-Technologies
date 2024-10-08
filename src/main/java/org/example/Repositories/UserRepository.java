@@ -18,11 +18,14 @@ public class UserRepository implements EntityRepository<User> {
 
     @Override
     public void create(User user) {
+        Transaction transaction = session.beginTransaction();
         try {
-            Transaction transaction = session.beginTransaction();
             session.save(user);
             transaction.commit();
         } catch (OptimisticLockException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
@@ -40,22 +43,28 @@ public class UserRepository implements EntityRepository<User> {
 
     @Override
     public void update(User user) {
+        Transaction transaction = session.beginTransaction();
         try {
-            Transaction transaction = session.beginTransaction();
             session.update(user);
             transaction.commit();
         } catch (OptimisticLockException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
 
     @Override
     public void delete(User user) {
+        Transaction transaction = session.beginTransaction();
         try {
-            Transaction transaction = session.beginTransaction();
             session.delete(user);
             transaction.commit();
         } catch (OptimisticLockException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }

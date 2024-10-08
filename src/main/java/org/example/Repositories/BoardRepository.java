@@ -18,11 +18,14 @@ public class BoardRepository implements EntityRepository<Board> {
 
     @Override
     public void create(Board board) {
+        Transaction transaction = session.beginTransaction();
         try {
-            Transaction transaction = session.beginTransaction();
             session.save(board);
             transaction.commit();
         } catch (OptimisticLockException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
@@ -40,23 +43,30 @@ public class BoardRepository implements EntityRepository<Board> {
 
     @Override
     public void update(Board board) {
+        Transaction transaction = session.beginTransaction();
         try {
-            Transaction transaction = session.beginTransaction();
             session.update(board);
             transaction.commit();
         } catch (OptimisticLockException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
 
     @Override
     public void delete(Board board) {
+        Transaction transaction = session.beginTransaction();
         try {
-            Transaction transaction = session.beginTransaction();
             session.delete(board);
             transaction.commit();
         } catch (OptimisticLockException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
 }
+

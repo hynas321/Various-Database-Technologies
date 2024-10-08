@@ -18,11 +18,14 @@ public class PostRepository implements EntityRepository<Post> {
 
     @Override
     public void create(Post post) {
+        Transaction transaction = session.beginTransaction();
         try {
-            Transaction transaction = session.beginTransaction();
             session.save(post);
             transaction.commit();
         } catch (OptimisticLockException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
@@ -40,23 +43,30 @@ public class PostRepository implements EntityRepository<Post> {
 
     @Override
     public void update(Post post) {
+        Transaction transaction = session.beginTransaction();
         try {
-            Transaction transaction = session.beginTransaction();
             session.update(post);
             transaction.commit();
         } catch (OptimisticLockException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
 
     @Override
     public void delete(Post post) {
+        Transaction transaction = session.beginTransaction();
         try {
-            Transaction transaction = session.beginTransaction();
             session.delete(post);
             transaction.commit();
         } catch (OptimisticLockException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
 }
+

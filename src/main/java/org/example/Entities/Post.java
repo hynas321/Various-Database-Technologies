@@ -19,7 +19,7 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User creator;
+    private Account creator;
 
     @ManyToOne
     @JoinColumn(name = "board_id", nullable = false)
@@ -30,7 +30,7 @@ public class Post {
 
     public Post() {}
 
-    public Post(String content, User creator, Board board) {
+    public Post(String content, Account creator, Board board) {
         this.content = content;
         this.creator = creator;
         this.board = board;
@@ -60,11 +60,11 @@ public class Post {
         this.content = content;
     }
 
-    public User getCreator() {
+    public Account getCreator() {
         return creator;
     }
 
-    public void setCreator(User creator) {
+    public void setCreator(Account creator) {
         this.creator = creator;
     }
 

@@ -21,11 +21,11 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User creator;
+    private Account creator;
 
     public Comment() {}
 
-    public Comment(String content, Post post, User creator) {
+    public Comment(String content, Post post, Account creator) {
         this.content = content;
         this.post = post;
         this.creator = creator;
@@ -63,11 +63,11 @@ public class Comment {
         this.post = post;
     }
 
-    public User getCreator() {
+    public Account getCreator() {
         return creator;
     }
 
-    public void setCreator(User creator) {
+    public void setCreator(Account creator) {
         this.creator = creator;
     }
 }

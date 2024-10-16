@@ -13,7 +13,9 @@
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
+        <mapping class="org.example.Entities.Account"/>
         <mapping class="org.example.Entities.User"/>
+        <mapping class="org.example.Entities.Admin"/>
         <mapping class="org.example.Entities.Board"/>
         <mapping class="org.example.Entities.Post"/>
         <mapping class="org.example.Entities.Comment"/>

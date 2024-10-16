@@ -1,71 +1,89 @@
 package org.example.Services;
 
 import org.example.Entities.Board;
-import org.example.Entities.User;
+import org.example.Entities.Account;
+import org.example.Entities.Admin;
 import org.example.Repositories.Interfaces.EntityRepository;
 import org.example.Services.Interfaces.IBoardService;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.util.List;
 import java.util.Optional;
 
 public class BoardService implements IBoardService {
     private final EntityRepository<Board> boardRepository;
-    private final EntityRepository<User> userRepository;
+    private final EntityRepository<Account> accountRepository;
+    private final Session session;
 
-    public BoardService(EntityRepository<Board> boardRepository, EntityRepository<User> userRepository) {
+    public BoardService(EntityRepository<Board> boardRepository, EntityRepository<Account> accountRepository, Session session) {
         this.boardRepository = boardRepository;
-        this.userRepository = userRepository;
+        this.accountRepository = accountRepository;
+        this.session = session;
     }
 
     @Override
     public Optional<Board> createBoard(String name) {
-        if (name == null || name.isEmpty()) {
+        Transaction transaction = session.beginTransaction();
+
+        try {
+            Board board = new Board(name);
+            boardRepository.create(board);
+            transaction.commit();
+            return Optional.of(board);
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
             return Optional.empty();
         }
-
-        Board board = new Board(name);
-        boardRepository.create(board);
-        return Optional.of(board);
     }
 
     @Override
-    public boolean deleteBoard(Long boardId, Long userId) {
-        if (boardId == null || userId == null) {
+    public boolean deleteBoard(Long boardId, Long accountId) {
+        Transaction transaction = session.beginTransaction();
+
+        try {
+            Board board = boardRepository.getById(boardId);
+            Account account = accountRepository.getById(accountId);
+
+            if (board == null || account == null || (!(account instanceof Admin) && !board.getMembers().contains(account))) {
+                transaction.rollback();
+                return false;
+            }
+
+            boardRepository.delete(board);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
             return false;
         }
-
-        Board board = boardRepository.getById(boardId);
-        User user = userRepository.getById(userId);
-
-        if (board == null || user == null || !board.getMembers().contains(user)) {
-            return false;
-        }
-
-        boardRepository.delete(board);
-        return true;
     }
 
     @Override
     public boolean updateBoard(Board board) {
-        if (board == null || board.getId() == null) {
+        Transaction transaction = session.beginTransaction();
+
+        try {
+            Board existingBoard = boardRepository.getById(board.getId());
+            if (existingBoard == null) {
+                transaction.rollback();
+                return false;
+            }
+
+            boardRepository.update(board);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
             return false;
         }
-
-        Board existingBoard = boardRepository.getById(board.getId());
-        if (existingBoard == null) {
-            return false;
-        }
-
-        boardRepository.update(board);
-        return true;
     }
 
     @Override
     public Optional<Board> getBoardById(Long boardId) {
-        if (boardId == null) {
-            return Optional.empty();
-        }
-
         return Optional.ofNullable(boardRepository.getById(boardId));
     }
 
@@ -75,38 +93,50 @@ public class BoardService implements IBoardService {
     }
 
     @Override
-    public boolean addUserToBoard(Long boardId, Long userId) {
-        if (boardId == null || userId == null) {
+    public boolean addUserToBoard(Long boardId, Long accountId) {
+        Transaction transaction = session.beginTransaction();
+
+        try {
+            Board board = boardRepository.getById(boardId);
+            Account account = accountRepository.getById(accountId);
+
+            if (board == null || account == null) {
+                transaction.rollback();
+                return false;
+            }
+
+            board.getMembers().add(account);
+            boardRepository.update(board);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
             return false;
         }
-
-        Board board = boardRepository.getById(boardId);
-        User user = userRepository.getById(userId);
-
-        if (board == null || user == null) {
-            return false;
-        }
-
-        board.getMembers().add(user);
-        boardRepository.update(board);
-        return true;
     }
 
     @Override
-    public boolean removeUserFromBoard(Long boardId, Long userId) {
-        if (boardId == null || userId == null) {
+    public boolean removeUserFromBoard(Long boardId, Long accountId) {
+        Transaction transaction = session.beginTransaction();
+
+        try {
+            Board board = boardRepository.getById(boardId);
+            Account account = accountRepository.getById(accountId);
+
+            if (board == null || account == null || !board.getMembers().contains(account)) {
+                transaction.rollback();
+                return false;
+            }
+
+            board.getMembers().remove(account);
+            boardRepository.update(board);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
             return false;
         }
-
-        Board board = boardRepository.getById(boardId);
-        User user = userRepository.getById(userId);
-
-        if (board == null || user == null || !board.getMembers().contains(user)) {
-            return false;
-        }
-
-        board.getMembers().remove(user);
-        boardRepository.update(board);
-        return true;
     }
 }

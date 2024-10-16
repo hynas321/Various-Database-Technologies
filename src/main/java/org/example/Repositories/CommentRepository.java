@@ -1,10 +1,8 @@
 package org.example.Repositories;
 
-import jakarta.persistence.OptimisticLockException;
 import org.example.Entities.Comment;
 import org.example.Repositories.Interfaces.EntityRepository;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import java.util.List;
@@ -18,16 +16,7 @@ public class CommentRepository implements EntityRepository<Comment> {
 
     @Override
     public void create(Comment comment) {
-        Transaction transaction = session.beginTransaction();
-        try {
-            session.save(comment);
-            transaction.commit();
-        } catch (OptimisticLockException e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
+        session.save(comment);
     }
 
     @Override
@@ -43,29 +32,11 @@ public class CommentRepository implements EntityRepository<Comment> {
 
     @Override
     public void update(Comment comment) {
-        Transaction transaction = session.beginTransaction();
-        try {
-            session.update(comment);
-            transaction.commit();
-        } catch (OptimisticLockException e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
+        session.update(comment);
     }
 
     @Override
     public void delete(Comment comment) {
-        Transaction transaction = session.beginTransaction();
-        try {
-            session.delete(comment);
-            transaction.commit();
-        } catch (OptimisticLockException e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
+        session.delete(comment);
     }
 }

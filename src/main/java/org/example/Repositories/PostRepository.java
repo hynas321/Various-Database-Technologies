@@ -1,10 +1,8 @@
 package org.example.Repositories;
 
-import jakarta.persistence.OptimisticLockException;
 import org.example.Entities.Post;
 import org.example.Repositories.Interfaces.EntityRepository;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import java.util.List;
@@ -18,16 +16,7 @@ public class PostRepository implements EntityRepository<Post> {
 
     @Override
     public void create(Post post) {
-        Transaction transaction = session.beginTransaction();
-        try {
-            session.save(post);
-            transaction.commit();
-        } catch (OptimisticLockException e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
+        session.save(post);
     }
 
     @Override
@@ -43,30 +32,11 @@ public class PostRepository implements EntityRepository<Post> {
 
     @Override
     public void update(Post post) {
-        Transaction transaction = session.beginTransaction();
-        try {
-            session.update(post);
-            transaction.commit();
-        } catch (OptimisticLockException e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
+        session.update(post);
     }
 
     @Override
     public void delete(Post post) {
-        Transaction transaction = session.beginTransaction();
-        try {
-            session.delete(post);
-            transaction.commit();
-        } catch (OptimisticLockException e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
+        session.delete(post);
     }
 }
-

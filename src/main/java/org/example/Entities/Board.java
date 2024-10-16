@@ -21,7 +21,7 @@ public class Board {
     private Set<Post> posts = new HashSet<>();
 
     @ManyToMany(mappedBy = "boards")
-    private Set<User> members = new HashSet<>();
+    private Set<Account> members = new HashSet<>();
 
     public Board() {}
 
@@ -61,11 +61,11 @@ public class Board {
         this.posts = posts;
     }
 
-    public Set<User> getMembers() {
+    public Set<Account> getMembers() {
         return members;
     }
 
-    public void setMembers(Set<User> members) {
+    public void setMembers(Set<Account> members) {
         this.members = members;
     }
 }

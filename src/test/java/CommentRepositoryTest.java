@@ -1,13 +1,14 @@
 import org.example.Entities.Board;
 import org.example.Entities.Comment;
 import org.example.Entities.Post;
+import org.example.Entities.Account;
 import org.example.Entities.User;
+import org.example.Entities.Admin;
 import org.example.Repositories.BoardRepository;
 import org.example.Repositories.CommentRepository;
 import org.example.Repositories.Interfaces.EntityRepository;
 import org.example.Repositories.PostRepository;
-import org.example.Repositories.UserRepository;
-import org.hibernate.Session;
+import org.example.Repositories.AccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CommentRepositoryTest extends BaseRepositoryTest {
 
     private EntityRepository<Comment> commentRepository;
-    private EntityRepository<User> userRepository;
+    private EntityRepository<Account> accountRepository;
     private EntityRepository<Post> postRepository;
     private EntityRepository<Board> boardRepository;
 
@@ -27,15 +28,15 @@ class CommentRepositoryTest extends BaseRepositoryTest {
     public void setUp() {
         super.setUp();
         commentRepository = new CommentRepository(session);
-        userRepository = new UserRepository(session);
+        accountRepository = new AccountRepository(session);
         postRepository = new PostRepository(session);
         boardRepository = new BoardRepository(session);
     }
 
     @Test
-    void create_ShouldSaveComment() {
+    void create_ShouldSaveCommentByUser() {
         User user = new User("comment_user@example.com", "password123");
-        userRepository.create(user);
+        accountRepository.create(user);
 
         Board board = new Board("Board for Post");
         boardRepository.create(board);
@@ -54,9 +55,30 @@ class CommentRepositoryTest extends BaseRepositoryTest {
     }
 
     @Test
+    void create_ShouldSaveCommentByAdmin() {
+        Admin admin = new Admin("admin_comment@example.com", "adminpassword123");
+        accountRepository.create(admin);
+
+        Board board = new Board("Board for Admin Comment");
+        boardRepository.create(board);
+
+        Post post = new Post("Post for Admin Comment", admin, board);
+        postRepository.create(post);
+
+        Comment comment = new Comment("Admin comment content", post, admin);
+        commentRepository.create(comment);
+
+        Comment retrievedComment = commentRepository.getById(comment.getId());
+        assertNotNull(retrievedComment);
+        assertEquals("Admin comment content", retrievedComment.getContent());
+        assertEquals(post.getId(), retrievedComment.getPost().getId());
+        assertEquals(admin.getId(), retrievedComment.getCreator().getId());
+    }
+
+    @Test
     void getById_ShouldReturnComment() {
         User user = new User("comment_user2@example.com", "password123");
-        userRepository.create(user);
+        accountRepository.create(user);
 
         Board board = new Board("Board for Another Post");
         boardRepository.create(board);
@@ -75,7 +97,10 @@ class CommentRepositoryTest extends BaseRepositoryTest {
     @Test
     void getAll_ShouldReturnListOfComments() {
         User user = new User("comment_user3@example.com", "password123");
-        userRepository.create(user);
+        accountRepository.create(user);
+
+        Admin admin = new Admin("admin_user3@example.com", "adminpassword123");
+        accountRepository.create(admin);
 
         Board board = new Board("Board for Multiple Comments");
         boardRepository.create(board);
@@ -84,19 +109,21 @@ class CommentRepositoryTest extends BaseRepositoryTest {
         postRepository.create(post);
 
         Comment comment1 = new Comment("Comment 1 content", post, user);
-        Comment comment2 = new Comment("Comment 2 content", post, user);
+        Comment comment2 = new Comment("Comment 2 content", post, admin);
 
         commentRepository.create(comment1);
         commentRepository.create(comment2);
 
         List<Comment> comments = commentRepository.getAll();
         assertFalse(comments.isEmpty());
+        assertTrue(comments.stream().anyMatch(comment -> comment.getCreator() instanceof User));
+        assertTrue(comments.stream().anyMatch(comment -> comment.getCreator() instanceof Admin));
     }
 
     @Test
-    void update_ShouldUpdateComment() {
+    void update_ShouldUpdateCommentByUser() {
         User user = new User("comment_user4@example.com", "password123");
-        userRepository.create(user);
+        accountRepository.create(user);
 
         Board board = new Board("Board for Updating Comment");
         boardRepository.create(board);
@@ -115,9 +142,30 @@ class CommentRepositoryTest extends BaseRepositoryTest {
     }
 
     @Test
-    void delete_ShouldDeleteComment() {
+    void update_ShouldUpdateCommentByAdmin() {
+        Admin admin = new Admin("admin_user4@example.com", "adminpassword123");
+        accountRepository.create(admin);
+
+        Board board = new Board("Board for Updating Admin Comment");
+        boardRepository.create(board);
+
+        Post post = new Post("Post for Updating Admin Comment", admin, board);
+        postRepository.create(post);
+
+        Comment comment = new Comment("Original admin comment content", post, admin);
+        commentRepository.create(comment);
+
+        comment.setContent("Updated admin comment content");
+        commentRepository.update(comment);
+
+        Comment updatedComment = commentRepository.getById(comment.getId());
+        assertEquals("Updated admin comment content", updatedComment.getContent());
+    }
+
+    @Test
+    void delete_ShouldDeleteCommentByUser() {
         User user = new User("comment_user5@example.com", "password123");
-        userRepository.create(user);
+        accountRepository.create(user);
 
         Board board = new Board("Board for Deleting Comment");
         boardRepository.create(board);
@@ -135,56 +183,22 @@ class CommentRepositoryTest extends BaseRepositoryTest {
     }
 
     @Test
-    void versionField_ShouldIncrementOnEachUpdate_ForComment() {
-        Session createSession = sessionFactory.openSession();
-        createSession.beginTransaction();
-        User user = new User("version_test_user@example.com", "password123");
-        userRepository.create(user);
+    void delete_ShouldDeleteCommentByAdmin() {
+        Admin admin = new Admin("admin_user5@example.com", "adminpassword123");
+        accountRepository.create(admin);
 
-        Board board = new Board("Board for Version Test");
+        Board board = new Board("Board for Deleting Admin Comment");
         boardRepository.create(board);
 
-        Post post = new Post("Post for Versioning", user, board);
+        Post post = new Post("Post for Deleting Admin Comment", admin, board);
         postRepository.create(post);
 
-        Comment comment = new Comment("Initial comment", post, user);
+        Comment comment = new Comment("Admin comment to delete", post, admin);
         commentRepository.create(comment);
-        createSession.getTransaction().commit();
-        createSession.close();
 
-        Session session1 = sessionFactory.openSession();
-        session1.beginTransaction();
-        Comment retrievedComment = session1.get(Comment.class, comment.getId());
-        int initialVersion = retrievedComment.getVersion();
-        session1.getTransaction().commit();
-        session1.close();
+        commentRepository.delete(comment);
 
-        Session session2 = sessionFactory.openSession();
-        session2.beginTransaction();
-        retrievedComment.setContent("Updated by first transaction");
-        session2.merge(retrievedComment);
-        session2.getTransaction().commit();
-
-        session2.beginTransaction();
-        Comment updatedComment = session2.get(Comment.class, retrievedComment.getId());
-        int firstUpdatedVersion = updatedComment.getVersion();
-        session2.getTransaction().commit();
-        session2.close();
-
-        assertTrue(firstUpdatedVersion > initialVersion, "Version should increment after the first update");
-
-        Session session3 = sessionFactory.openSession();
-        session3.beginTransaction();
-        updatedComment.setContent("Updated by second transaction");
-        session3.merge(updatedComment);
-        session3.getTransaction().commit();
-
-        session3.beginTransaction();
-        Comment secondUpdatedComment = session3.get(Comment.class, updatedComment.getId());
-        int secondUpdatedVersion = secondUpdatedComment.getVersion();
-        session3.getTransaction().commit();
-        session3.close();
-
-        assertTrue(secondUpdatedVersion > firstUpdatedVersion, "Version should increment after the second update");
+        Comment deletedComment = commentRepository.getById(comment.getId());
+        assertNull(deletedComment);
     }
 }

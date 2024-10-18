@@ -1,42 +1,61 @@
 package org.example.Repositories;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import org.example.Entities.Post;
-import org.example.Repositories.Interfaces.EntityRepository;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
+import org.example.Mappers.EntityMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class PostRepository implements EntityRepository<Post> {
-    private final Session session;
+import static com.mongodb.client.model.Filters.eq;
 
-    public PostRepository(Session session) {
-        this.session = session;
+public class PostRepository implements EntityRepository<Post> {
+    private final MongoCollection<Document> collection;
+    private final EntityMapper<Post> postMapper;
+
+    public PostRepository(MongoDatabase database, EntityMapper<Post> postMapper) {
+        this.collection = database.getCollection("posts");
+        this.postMapper = postMapper;
     }
 
     @Override
     public void create(Post post) {
-        session.save(post);
+        Document postDocument = postMapper.toDocument(post);
+        collection.insertOne(postDocument);
     }
 
     @Override
-    public Post getById(Long id) {
-        return session.get(Post.class, id);
+    public Post getById(String id) {
+        Document document = collection.find(eq("_id", id)).first();
+
+        if (document != null) {
+            return postMapper.fromDocument(document);
+        }
+
+        return null;
     }
 
     @Override
     public List<Post> getAll() {
-        Query<Post> query = session.createQuery("from Post", Post.class);
-        return query.list();
+        List<Post> posts = new ArrayList<>();
+
+        for (Document document : collection.find()) {
+            posts.add(postMapper.fromDocument(document));
+        }
+
+        return posts;
     }
 
     @Override
     public void update(Post post) {
-        session.update(post);
+        Document postDoc = postMapper.toDocument(post);
+        collection.replaceOne(eq("_id", post.getId()), postDoc);
     }
 
     @Override
     public void delete(Post post) {
-        session.delete(post);
+        collection.deleteOne(eq("_id", post.getId()));
     }
 }

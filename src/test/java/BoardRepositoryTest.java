@@ -3,8 +3,10 @@ import org.example.Entities.Post;
 import org.example.Entities.Account;
 import org.example.Entities.User;
 import org.example.Entities.Admin;
+import org.example.Mappers.AccountMapper;
+import org.example.Mappers.BoardMapper;
 import org.example.Repositories.BoardRepository;
-import org.example.Repositories.Interfaces.EntityRepository;
+import org.example.Repositories.EntityRepository;
 import org.example.Repositories.AccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,8 +24,10 @@ class BoardRepositoryTest extends BaseRepositoryTest {
     @Override
     public void setUp() {
         super.setUp();
-        boardRepository = new BoardRepository(session);
-        accountRepository = new AccountRepository(session);
+        AccountMapper accountMapper = new AccountMapper();
+        BoardMapper boardMapper = new BoardMapper();
+        accountRepository = new AccountRepository(database, accountMapper);
+        boardRepository = new BoardRepository(database, boardMapper);
     }
 
     @Test
@@ -51,7 +55,7 @@ class BoardRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void create_ShouldSaveBoardByAdmin() {
-        Admin admin = new Admin("admin_unique1@example.com", "adminpassword123"); // Use a unique email
+        Admin admin = new Admin("admin_unique1@example.com", "adminpassword123");
         accountRepository.create(admin);
 
         Board board = new Board("Admin's Test Board");
@@ -109,34 +113,33 @@ class BoardRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void create_ShouldSaveBoardWithPostsByUser() {
-        User user = new User("user_unique2@example.com", "password123"); // Use a unique email
+        User user = new User("user_unique2@example.com", "password123");
         accountRepository.create(user);
 
         Board board = new Board("Board with Posts");
-        Post post = new Post("Post in Board", user, board);
-        board.getPosts().add(post);
+        Post post = new Post("Post in Board", user.getId(), board.getId());
+        board.getPostIds().add(post.getId());
 
         boardRepository.create(board);
 
         Board retrievedBoard = boardRepository.getById(board.getId());
         assertNotNull(retrievedBoard);
-        assertEquals(1, retrievedBoard.getPosts().size());
+        assertEquals(1, retrievedBoard.getPostIds().size());
     }
 
     @Test
     void create_ShouldSaveBoardWithPostsByAdmin() {
-        Admin admin = new Admin("admin_unique2@example.com", "adminpassword123"); // Use a unique email
+        Admin admin = new Admin("admin_unique2@example.com", "adminpassword123");
         accountRepository.create(admin);
 
         Board board = new Board("Admin Board with Posts");
-        Post post = new Post("Admin Post in Board", admin, board);
-        board.getPosts().add(post);
+        Post post = new Post("Admin Post in Board", admin.getId(), board.getId());
+        board.getPostIds().add(post.getId());
 
         boardRepository.create(board);
 
         Board retrievedBoard = boardRepository.getById(board.getId());
         assertNotNull(retrievedBoard);
-        assertEquals(1, retrievedBoard.getPosts().size());
+        assertEquals(1, retrievedBoard.getPostIds().size());
     }
 }
-

@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IAccountService {
-    Optional<Account> createAccount(String email, String password, boolean isAdmin);
-    boolean deleteAccount(Long userId);
+    Account createAccount(String email, String password, boolean isAdmin);
+    boolean deleteAccount(String accountId);
     boolean updateAccount(Account account);
-    Optional<Account> getAccountById(Long userId);
+    Account getAccountById(String accountId);
     List<Account> getAllAccounts();
 }

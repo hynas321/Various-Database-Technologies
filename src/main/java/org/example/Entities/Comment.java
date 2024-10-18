@@ -1,50 +1,25 @@
 package org.example.Entities;
 
-import jakarta.persistence.*;
-
-@Entity
-@Table(name = "comments")
 public class Comment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Version
-    private int version;
-
-    @Column(nullable = false)
+    private String id;
     private String content;
-
-    @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private Account creator;
+    private String postId;
+    private String creatorId;
 
     public Comment() {}
 
-    public Comment(String content, Post post, Account creator) {
+    public Comment(String content, String postId, String creatorId) {
         this.content = content;
-        this.post = post;
-        this.creator = creator;
+        this.postId = postId;
+        this.creatorId = creatorId;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
-    }
-
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
     }
 
     public String getContent() {
@@ -55,19 +30,19 @@ public class Comment {
         this.content = content;
     }
 
-    public Post getPost() {
-        return post;
+    public String getPostId() {
+        return postId;
     }
 
-    public void setPost(Post post) {
-        this.post = post;
+    public void setPostId(String postId) {
+        this.postId = postId;
     }
 
-    public Account getCreator() {
-        return creator;
+    public String getCreatorId() {
+        return creatorId;
     }
 
-    public void setCreator(Account creator) {
-        this.creator = creator;
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
     }
 }

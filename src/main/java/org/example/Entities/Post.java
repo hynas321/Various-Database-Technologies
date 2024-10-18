@@ -1,55 +1,29 @@
 package org.example.Entities;
 
-import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
-@Table(name = "posts")
 public class Post {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Version
-    private int version;
-
-    @Column(nullable = false)
+    private String id;
     private String content;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private Account creator;
-
-    @ManyToOne
-    @JoinColumn(name = "board_id", nullable = false)
-    private Board board;
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Comment> comments = new HashSet<>();
+    private String creatorId;
+    private String boardId;
+    private Set<String> commentIds = new HashSet<>();
 
     public Post() {}
 
-    public Post(String content, Account creator, Board board) {
+    public Post(String content, String creatorId, String boardId) {
         this.content = content;
-        this.creator = creator;
-        this.board = board;
+        this.creatorId = creatorId;
+        this.boardId = boardId;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
-    }
-
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
     }
 
     public String getContent() {
@@ -60,27 +34,27 @@ public class Post {
         this.content = content;
     }
 
-    public Account getCreator() {
-        return creator;
+    public String getCreatorId() {
+        return creatorId;
     }
 
-    public void setCreator(Account creator) {
-        this.creator = creator;
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
     }
 
-    public Board getBoard() {
-        return board;
+    public String getBoardId() {
+        return boardId;
     }
 
-    public void setBoard(Board board) {
-        this.board = board;
+    public void setBoardId(String boardId) {
+        this.boardId = boardId;
     }
 
-    public Set<Comment> getComments() {
-        return comments;
+    public Set<String> getCommentIds() {
+        return commentIds;
     }
 
-    public void setComments(Set<Comment> comments) {
-        this.comments = comments;
+    public void setCommentIds(Set<String> commentIds) {
+        this.commentIds = commentIds;
     }
 }

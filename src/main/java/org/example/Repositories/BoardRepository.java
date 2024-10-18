@@ -1,42 +1,61 @@
 package org.example.Repositories;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import org.example.Entities.Board;
-import org.example.Repositories.Interfaces.EntityRepository;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
+import org.example.Mappers.EntityMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class BoardRepository implements EntityRepository<Board> {
-    private final Session session;
+import static com.mongodb.client.model.Filters.eq;
 
-    public BoardRepository(Session session) {
-        this.session = session;
+public class BoardRepository implements EntityRepository<Board> {
+    private final MongoCollection<Document> collection;
+    private final EntityMapper<Board> boardMapper;
+
+    public BoardRepository(MongoDatabase database, EntityMapper<Board> boardMapper) {
+        this.collection = database.getCollection("boards");
+        this.boardMapper = boardMapper;
     }
 
     @Override
     public void create(Board board) {
-        session.save(board);
+        Document boardDoc = boardMapper.toDocument(board);
+        collection.insertOne(boardDoc);
     }
 
     @Override
-    public Board getById(Long id) {
-        return session.get(Board.class, id);
+    public Board getById(String id) {
+        Document document = collection.find(eq("_id", id)).first();
+
+        if (document != null) {
+            return boardMapper.fromDocument(document);
+        }
+
+        return null;
     }
 
     @Override
     public List<Board> getAll() {
-        Query<Board> query = session.createQuery("from Board", Board.class);
-        return query.list();
+        List<Board> boards = new ArrayList<>();
+
+        for (Document document : collection.find()) {
+            boards.add(boardMapper.fromDocument(document));
+        }
+
+        return boards;
     }
 
     @Override
     public void update(Board board) {
-        session.update(board);
+        Document boardDocument = boardMapper.toDocument(board);
+        collection.replaceOne(eq("_id", board.getId()), boardDocument);
     }
 
     @Override
     public void delete(Board board) {
-        session.delete(board);
+        collection.deleteOne(eq("_id", board.getId()));
     }
 }

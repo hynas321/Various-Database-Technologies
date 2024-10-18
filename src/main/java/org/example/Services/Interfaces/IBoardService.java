@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IBoardService {
-    Optional<Board> createBoard(String name);
-    boolean deleteBoard(Long boardId, Long userId);
+    Board createBoard(String name);
+    boolean deleteBoard(String boardId, String userId);
     boolean updateBoard(Board board);
-    Optional<Board> getBoardById(Long boardId);
+    Board getBoardById(String boardId);
     List<Board> getAllBoards();
-    boolean addUserToBoard(Long boardId, Long userId);
-    boolean removeUserFromBoard(Long boardId, Long userId);
+    boolean addUserToBoard(String boardId, String userId);
+    boolean removeUserFromBoard(String boardId, String userId);
 }

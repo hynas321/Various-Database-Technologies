@@ -1,8 +1,9 @@
 import org.example.Entities.Account;
-import org.example.Entities.User;
 import org.example.Entities.Admin;
-import org.example.Repositories.Interfaces.EntityRepository;
+import org.example.Entities.User;
+import org.example.Mappers.AccountMapper;
 import org.example.Repositories.AccountRepository;
+import org.example.Repositories.EntityRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,14 +12,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AccountRepositoryTest extends BaseRepositoryTest {
-
     private EntityRepository<Account> accountRepository;
 
     @BeforeEach
-    @Override
     public void setUp() {
         super.setUp();
-        accountRepository = new AccountRepository(session);
+        AccountMapper accountMapper = new AccountMapper();
+        accountRepository = new AccountRepository(database, accountMapper);
     }
 
     @Test

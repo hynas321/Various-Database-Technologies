@@ -3,8 +3,11 @@ import org.example.Entities.Post;
 import org.example.Entities.Account;
 import org.example.Entities.User;
 import org.example.Entities.Admin;
+import org.example.Mappers.AccountMapper;
+import org.example.Mappers.BoardMapper;
+import org.example.Mappers.PostMapper;
 import org.example.Repositories.BoardRepository;
-import org.example.Repositories.Interfaces.EntityRepository;
+import org.example.Repositories.EntityRepository;
 import org.example.Repositories.PostRepository;
 import org.example.Repositories.AccountRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,9 +27,13 @@ class PostRepositoryTest extends BaseRepositoryTest {
     @Override
     public void setUp() {
         super.setUp();
-        postRepository = new PostRepository(session);
-        accountRepository = new AccountRepository(session);
-        boardRepository = new BoardRepository(session);
+        AccountMapper accountMapper = new AccountMapper();
+        BoardMapper boardMapper = new BoardMapper();
+        PostMapper postMapper = new PostMapper();
+
+        postRepository = new PostRepository(database, postMapper);
+        accountRepository = new AccountRepository(database, accountMapper);
+        boardRepository = new BoardRepository(database, boardMapper);
     }
 
     @Test
@@ -37,14 +44,14 @@ class PostRepositoryTest extends BaseRepositoryTest {
         Board board = new Board("Test Board");
         boardRepository.create(board);
 
-        Post post = new Post("Test Post content", user, board);
+        Post post = new Post("Test Post content", user.getId(), board.getId());
         postRepository.create(post);
 
         Post retrievedPost = postRepository.getById(post.getId());
         assertNotNull(retrievedPost);
         assertEquals("Test Post content", retrievedPost.getContent());
-        assertEquals(user.getId(), retrievedPost.getCreator().getId());
-        assertEquals(board.getId(), retrievedPost.getBoard().getId());
+        assertEquals(user.getId(), retrievedPost.getCreatorId());
+        assertEquals(board.getId(), retrievedPost.getBoardId());
     }
 
     @Test
@@ -55,14 +62,14 @@ class PostRepositoryTest extends BaseRepositoryTest {
         Board board = new Board("Admin Test Board");
         boardRepository.create(board);
 
-        Post post = new Post("Admin Post content", admin, board);
+        Post post = new Post("Admin Post content", admin.getId(), board.getId());
         postRepository.create(post);
 
         Post retrievedPost = postRepository.getById(post.getId());
         assertNotNull(retrievedPost);
         assertEquals("Admin Post content", retrievedPost.getContent());
-        assertEquals(admin.getId(), retrievedPost.getCreator().getId());
-        assertEquals(board.getId(), retrievedPost.getBoard().getId());
+        assertEquals(admin.getId(), retrievedPost.getCreatorId());
+        assertEquals(board.getId(), retrievedPost.getBoardId());
     }
 
     @Test
@@ -73,7 +80,7 @@ class PostRepositoryTest extends BaseRepositoryTest {
         Board board = new Board("Another Board");
         boardRepository.create(board);
 
-        Post post = new Post("Another Post content", user, board);
+        Post post = new Post("Another Post content", user.getId(), board.getId());
         postRepository.create(post);
 
         Post retrievedPost = postRepository.getById(post.getId());
@@ -92,16 +99,16 @@ class PostRepositoryTest extends BaseRepositoryTest {
         Board board = new Board("Board for Posts");
         boardRepository.create(board);
 
-        Post post1 = new Post("Post 1 content", user, board);
-        Post post2 = new Post("Post 2 content", admin, board);
+        Post post1 = new Post("Post 1 content", user.getId(), board.getId());
+        Post post2 = new Post("Post 2 content", admin.getId(), board.getId());
 
         postRepository.create(post1);
         postRepository.create(post2);
 
         List<Post> posts = postRepository.getAll();
         assertFalse(posts.isEmpty());
-        assertTrue(posts.stream().anyMatch(post -> post.getCreator() instanceof User));
-        assertTrue(posts.stream().anyMatch(post -> post.getCreator() instanceof Admin));
+        assertTrue(posts.stream().anyMatch(post -> post.getCreatorId().equals(user.getId())));
+        assertTrue(posts.stream().anyMatch(post -> post.getCreatorId().equals(admin.getId())));
     }
 
     @Test
@@ -112,7 +119,7 @@ class PostRepositoryTest extends BaseRepositoryTest {
         Board board = new Board("Board to Update");
         boardRepository.create(board);
 
-        Post post = new Post("Original Post content", user, board);
+        Post post = new Post("Original Post content", user.getId(), board.getId());
         postRepository.create(post);
 
         post.setContent("Updated Post content");
@@ -130,7 +137,7 @@ class PostRepositoryTest extends BaseRepositoryTest {
         Board board = new Board("Admin Board to Update");
         boardRepository.create(board);
 
-        Post post = new Post("Original Admin Post content", admin, board);
+        Post post = new Post("Original Admin Post content", admin.getId(), board.getId());
         postRepository.create(post);
 
         post.setContent("Updated Admin Post content");
@@ -148,7 +155,7 @@ class PostRepositoryTest extends BaseRepositoryTest {
         Board board = new Board("Board to Delete");
         boardRepository.create(board);
 
-        Post post = new Post("Post to delete", user, board);
+        Post post = new Post("Post to delete", user.getId(), board.getId());
         postRepository.create(post);
 
         postRepository.delete(post);
@@ -165,7 +172,7 @@ class PostRepositoryTest extends BaseRepositoryTest {
         Board board = new Board("Admin Board to Delete");
         boardRepository.create(board);
 
-        Post post = new Post("Admin Post to delete", admin, board);
+        Post post = new Post("Admin Post to delete", admin.getId(), board.getId());
         postRepository.create(post);
 
         postRepository.delete(post);

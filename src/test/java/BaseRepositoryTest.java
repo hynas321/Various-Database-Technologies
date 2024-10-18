@@ -1,28 +1,22 @@
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
+import com.mongodb.client.MongoDatabase;
+import org.example.Repositories.MongoDbConnection;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 public abstract class BaseRepositoryTest {
-    protected SessionFactory sessionFactory;
-    protected Session session;
+    protected MongoDbConnection mongoDbConnection;
+    protected MongoDatabase database;
 
     @BeforeEach
     public void setUp() {
-        sessionFactory = new Configuration()
-                .configure("hibernate-test.cfg.xml")
-                .buildSessionFactory();
-        session = sessionFactory.openSession();
+        mongoDbConnection = new MongoDbConnection("mongodb://localhost:27017,localhost:27018,localhost:27019/?replicaSet=rs0", "testDatabase");
+        database = mongoDbConnection.getDatabase();
     }
 
     @AfterEach
     public void tearDown() {
-        if (session != null) {
-            session.close();
-        }
-        if (sessionFactory != null) {
-            sessionFactory.close();
+        if (mongoDbConnection != null) {
+            mongoDbConnection.close();
         }
     }
 }

@@ -1,27 +1,13 @@
 package org.example.Entities;
 
-import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
-@Table(name = "boards")
 public class Board {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Version
-    private int version;
-
-    @Column(nullable = false)
+    private String id;
     private String name;
-
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Post> posts = new HashSet<>();
-
-    @ManyToMany(mappedBy = "boards")
-    private Set<Account> members = new HashSet<>();
+    private Set<String> postIds = new HashSet<>();
+    private Set<String> memberIds = new HashSet<>();
 
     public Board() {}
 
@@ -29,20 +15,12 @@ public class Board {
         this.name = name;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
-    }
-
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
     }
 
     public String getName() {
@@ -53,19 +31,19 @@ public class Board {
         this.name = name;
     }
 
-    public Set<Post> getPosts() {
-        return posts;
+    public Set<String> getPostIds() {
+        return postIds;
     }
 
-    public void setPosts(Set<Post> posts) {
-        this.posts = posts;
+    public void setPostIds(Set<String> postIds) {
+        this.postIds = postIds;
     }
 
-    public Set<Account> getMembers() {
-        return members;
+    public Set<String> getMemberIds() {
+        return memberIds;
     }
 
-    public void setMembers(Set<Account> members) {
-        this.members = members;
+    public void setMemberIds(Set<String> memberIds) {
+        this.memberIds = memberIds;
     }
 }

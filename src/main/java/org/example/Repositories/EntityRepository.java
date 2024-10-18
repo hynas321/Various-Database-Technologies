@@ -1,10 +1,10 @@
-package org.example.Repositories.Interfaces;
+package org.example.Repositories;
 
 import java.util.List;
 
 public interface EntityRepository<T> {
     void create(T entity);
-    T getById(Long id);
+    T getById(String id);
     List<T> getAll();
     void update(T entity);
     void delete(T entity);

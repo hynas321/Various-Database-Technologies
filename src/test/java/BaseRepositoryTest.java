@@ -9,7 +9,7 @@ public abstract class BaseRepositoryTest {
 
     @BeforeEach
     public void setUp() {
-        mongoDbConnection = new MongoDbConnection("mongodb://localhost:27017,localhost:27018,localhost:27019/?replicaSet=rs0", "testDatabase");
+        mongoDbConnection = new MongoDbConnection("mongodb://mongodb1:27017,mongodb2:27018,mongodb3:27019/?replicaSet=replica_set_single", "testDatabase");
         database = mongoDbConnection.getDatabase();
     }
 

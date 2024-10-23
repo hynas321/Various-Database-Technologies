@@ -1,73 +1,83 @@
 version: '3.8'
 services:
-  mongo1:
-    image: mongo:latest
-    container_name: mongo1
-    hostname: mongo1
-    ports:
-      - 27017:27017
-    volumes:
-      - ./data/mongo1:/data/db
+  mongo_1:
+    build: .
+    image: mongocustom:7.0.2
+    container_name: mongodb1
+    hostname: mongodb1
     networks:
-      - mongo-cluster-network
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: password
-
-  mongo2:
-    image: mongo:latest
-    container_name: mongo2
-    hostname: mongo2
+      - mongonet
     ports:
-      - 27018:27017
-    volumes:
-      - ./data/mongo2:/data/db
-    networks:
-      - mongo-cluster-network
+      - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: password
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=adminpassword
+      - MONGO_INITDB_DATABASE=rentacar
+    command: --replSet replica_set_single --config /etc/mongod.conf --port 27017
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: always
 
-  mongo3:
-    image: mongo:latest
-    container_name: mongo3
-    hostname: mongo3
+  mongo_2:
+    build: .
+    image: mongocustom:7.0.2
+    container_name: mongodb2
+    hostname: mongodb2
+    networks:
+      - mongonet
     ports:
-      - 27019:27017
-    volumes:
-      - ./data/mongo3:/data/db
-    networks:
-      - mongo-cluster-network
+      - "27018:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: password
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=adminpassword
+      - MONGO_INITDB_DATABASE=rentacar
+    command: --replSet replica_set_single --config /etc/mongod.conf --port 27017
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: always
 
-  mongo-setup:
-    image: mongo:latest
+  mongo_3:
+    build: .
+    image: mongocustom:7.0.2
+    container_name: mongodb3
+    hostname: mongodb3
+    networks:
+      - mongonet
+    ports:
+      - "27019:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=adminpassword
+      - MONGO_INITDB_DATABASE=rentacar
+    command: --replSet replica_set_single --config /etc/mongod.conf --port 27017
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: always
+
+  mongoinit:
+    build: .
+    image: mongocustom:7.0.2
+    container_name: mongodbinitializer
+    networks:
+      - mongonet
     depends_on:
-      - mongo1
-      - mongo2
-      - mongo3
-    networks:
-      - mongo-cluster-network
-    entrypoint: >
-      bash -c "
-      sleep 10;
-      echo 'Initializing replica set...';
-      mongo --host mongo1:27017 <<EOF
-      rs.initiate(
-        {
-          _id: 'rs0',
-          members: [
-            { _id: 0, host: 'mongo1:27017' },
-            { _id: 1, host: 'mongo2:27017' },
-            { _id: 2, host: 'mongo3:27017' }
-          ]
-        }
-      )
-      EOF
-      "
+      mongo_1:
+        condition: service_healthy
+      mongo_2:
+        condition: service_healthy
+      mongo_3:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "-c", "sleep 10 && mongosh --host mongodb1:27017 --username admin --password adminpassword --authenticationDatabase admin --eval 'rs.initiate({_id: \"replica_set_single\", members: [{ _id: 0, host: \"mongodb1:27017\" }, { _id: 1, host: \"mongodb2:27017\" }, { _id: 2, host: \"mongodb3:27017\" }]})'"]
+    restart: on-failure
 
 networks:
-  mongo-cluster-network:
-    driver: bridge
+  mongonet: {}

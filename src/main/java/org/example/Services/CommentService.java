@@ -1,5 +1,6 @@
 package org.example.Services;
 
+import org.bson.types.ObjectId;
 import org.example.Entities.Comment;
 import org.example.Repositories.EntityRepository;
 import org.example.Services.Interfaces.ICommentService;
@@ -14,7 +15,7 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public Comment addComment(String postId, String userId, String content) {
+    public Comment addComment(ObjectId postId, ObjectId userId, String content) {
         try {
             Comment comment = new Comment(content, postId, userId);
             commentRepository.create(comment);
@@ -26,7 +27,7 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public boolean deleteComment(String commentId, String userId) {
+    public boolean deleteComment(ObjectId commentId, ObjectId userId) {
         try {
             Comment comment = commentRepository.getById(commentId);
             if (comment == null || !comment.getCreatorId().equals(userId)) {
@@ -42,7 +43,7 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public boolean updateComment(Comment comment, String userId) {
+    public boolean updateComment(Comment comment, ObjectId userId) {
         try {
             Comment existingComment = commentRepository.getById(comment.getId());
             if (existingComment == null || !existingComment.getCreatorId().equals(userId)) {
@@ -58,7 +59,7 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public Comment getCommentById(String commentId) {
+    public Comment getCommentById(ObjectId commentId) {
         return commentRepository.getById(commentId);
     }
 

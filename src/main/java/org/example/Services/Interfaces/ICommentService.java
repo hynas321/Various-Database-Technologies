@@ -1,14 +1,15 @@
 package org.example.Services.Interfaces;
 
+import org.bson.types.ObjectId;
 import org.example.Entities.Comment;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ICommentService {
-    Comment addComment(String postId, String userId, String content);
-    boolean deleteComment(String commentId, String userId);
-    boolean updateComment(Comment comment, String userId);
-    Comment getCommentById(String commentId);
+    Comment addComment(ObjectId postId, ObjectId userId, String content);
+    boolean deleteComment(ObjectId commentId, ObjectId userId);
+    boolean updateComment(Comment comment, ObjectId userId);
+    Comment getCommentById(ObjectId commentId);
     List<Comment> getAllComments();
 }

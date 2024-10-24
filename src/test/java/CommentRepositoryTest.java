@@ -4,10 +4,6 @@ import org.example.Entities.Post;
 import org.example.Entities.Account;
 import org.example.Entities.User;
 import org.example.Entities.Admin;
-import org.example.Mappers.AccountMapper;
-import org.example.Mappers.BoardMapper;
-import org.example.Mappers.CommentMapper;
-import org.example.Mappers.PostMapper;
 import org.example.Repositories.BoardRepository;
 import org.example.Repositories.CommentRepository;
 import org.example.Repositories.EntityRepository;
@@ -31,15 +27,11 @@ class CommentRepositoryTest extends BaseRepositoryTest {
     @Override
     public void setUp() {
         super.setUp();
-        AccountMapper accountMapper = new AccountMapper();
-        BoardMapper boardMapper = new BoardMapper();
-        PostMapper postMapper = new PostMapper();
-        CommentMapper commentMapper = new CommentMapper();
 
-        commentRepository = new CommentRepository(database, commentMapper);
-        accountRepository = new AccountRepository(database, accountMapper);
-        postRepository = new PostRepository(database, postMapper);
-        boardRepository = new BoardRepository(database, boardMapper);
+        commentRepository = new CommentRepository(database);
+        accountRepository = new AccountRepository(database);
+        postRepository = new PostRepository(database);
+        boardRepository = new BoardRepository(database);
     }
 
     @Test

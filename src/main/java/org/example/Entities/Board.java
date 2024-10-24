@@ -1,25 +1,37 @@
 package org.example.Entities;
 
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.types.ObjectId;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public class Board {
-    private String id;
+
+    @BsonId
+    private ObjectId id;
+
+    @BsonProperty("name")
     private String name;
-    private Set<String> postIds = new HashSet<>();
-    private Set<String> memberIds = new HashSet<>();
 
-    public Board() {}
+    @BsonProperty("postIds")
+    private Set<ObjectId> postIds = new HashSet<>();
 
-    public Board(String name) {
+    @BsonProperty("memberIds")
+    private Set<ObjectId> memberIds = new HashSet<>();
+
+    @BsonCreator
+    public Board(@BsonProperty("name") String name) {
         this.name = name;
     }
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 
@@ -31,19 +43,19 @@ public class Board {
         this.name = name;
     }
 
-    public Set<String> getPostIds() {
+    public Set<ObjectId> getPostIds() {
         return postIds;
     }
 
-    public void setPostIds(Set<String> postIds) {
+    public void setPostIds(Set<ObjectId> postIds) {
         this.postIds = postIds;
     }
 
-    public Set<String> getMemberIds() {
+    public Set<ObjectId> getMemberIds() {
         return memberIds;
     }
 
-    public void setMemberIds(Set<String> memberIds) {
+    public void setMemberIds(Set<ObjectId> memberIds) {
         this.memberIds = memberIds;
     }
 }

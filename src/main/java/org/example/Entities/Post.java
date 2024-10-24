@@ -1,28 +1,45 @@
 package org.example.Entities;
 
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.types.ObjectId;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public class Post {
-    private String id;
+
+    @BsonId
+    private ObjectId id;
+
+    @BsonProperty("content")
     private String content;
-    private String creatorId;
-    private String boardId;
-    private Set<String> commentIds = new HashSet<>();
 
-    public Post() {}
+    @BsonProperty("creatorId")
+    private ObjectId creatorId;
 
-    public Post(String content, String creatorId, String boardId) {
+    @BsonProperty("boardId")
+    private ObjectId boardId;
+
+    @BsonProperty("commentIds")
+    private Set<ObjectId> commentIds = new HashSet<>();
+
+    @BsonCreator
+    public Post(
+            @BsonProperty("content") String content,
+            @BsonProperty("creatorId") ObjectId creatorId,
+            @BsonProperty("boardId") ObjectId boardId) {
         this.content = content;
         this.creatorId = creatorId;
         this.boardId = boardId;
     }
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 
@@ -34,27 +51,27 @@ public class Post {
         this.content = content;
     }
 
-    public String getCreatorId() {
+    public ObjectId getCreatorId() {
         return creatorId;
     }
 
-    public void setCreatorId(String creatorId) {
+    public void setCreatorId(ObjectId creatorId) {
         this.creatorId = creatorId;
     }
 
-    public String getBoardId() {
+    public ObjectId getBoardId() {
         return boardId;
     }
 
-    public void setBoardId(String boardId) {
+    public void setBoardId(ObjectId boardId) {
         this.boardId = boardId;
     }
 
-    public Set<String> getCommentIds() {
+    public Set<ObjectId> getCommentIds() {
         return commentIds;
     }
 
-    public void setCommentIds(Set<String> commentIds) {
+    public void setCommentIds(Set<ObjectId> commentIds) {
         this.commentIds = commentIds;
     }
 }

@@ -1,5 +1,6 @@
 package org.example.Services;
 
+import org.bson.types.ObjectId;
 import org.example.Entities.Account;
 import org.example.Entities.Admin;
 import org.example.Entities.User;
@@ -33,7 +34,7 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    public boolean deleteAccount(String accountId) {
+    public boolean deleteAccount(ObjectId accountId) {
         try {
             Account account = accountRepository.getById(accountId);
             if (account == null) {
@@ -65,7 +66,7 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    public Account getAccountById(String accountId) {
+    public Account getAccountById(ObjectId accountId) {
         return accountRepository.getById(accountId);
     }
 

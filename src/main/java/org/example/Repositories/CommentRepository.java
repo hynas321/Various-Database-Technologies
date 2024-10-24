@@ -2,9 +2,8 @@ package org.example.Repositories;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.example.Entities.Comment;
-import org.example.Mappers.EntityMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,46 +11,32 @@ import java.util.List;
 import static com.mongodb.client.model.Filters.eq;
 
 public class CommentRepository implements EntityRepository<Comment> {
-    private final MongoCollection<Document> collection;
-    private final EntityMapper<Comment> commentMapper;
+    private final MongoCollection<Comment> collection;
 
-    public CommentRepository(MongoDatabase database, EntityMapper<Comment> commentMapper) {
-        this.collection = database.getCollection("comments");
-        this.commentMapper = commentMapper;
+    public CommentRepository(MongoDatabase database) {
+        this.collection = database.getCollection("comments", Comment.class);
     }
 
     @Override
     public void create(Comment comment) {
-        Document commentDocument = commentMapper.toDocument(comment);
-        collection.insertOne(commentDocument);
+        collection.insertOne(comment);
     }
 
     @Override
-    public Comment getById(String id) {
-        Document document = collection.find(eq("_id", id)).first();
-
-        if (document != null) {
-            return commentMapper.fromDocument(document);
-        }
-
-        return null;
+    public Comment getById(ObjectId id) {
+        return collection.find(eq("_id", id)).first();
     }
 
     @Override
     public List<Comment> getAll() {
         List<Comment> comments = new ArrayList<>();
-
-        for (Document document : collection.find()) {
-            comments.add(commentMapper.fromDocument(document));
-        }
-
+        collection.find().into(comments);
         return comments;
     }
 
     @Override
     public void update(Comment comment) {
-        Document commentDocument = commentMapper.toDocument(comment);
-        collection.replaceOne(eq("_id", comment.getId()), commentDocument);
+        collection.replaceOne(eq("_id", comment.getId()), comment);
     }
 
     @Override

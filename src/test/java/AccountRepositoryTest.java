@@ -1,7 +1,6 @@
 import org.example.Entities.Account;
 import org.example.Entities.Admin;
 import org.example.Entities.User;
-import org.example.Mappers.AccountMapper;
 import org.example.Repositories.AccountRepository;
 import org.example.Repositories.EntityRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,8 +16,7 @@ class AccountRepositoryTest extends BaseRepositoryTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        AccountMapper accountMapper = new AccountMapper();
-        accountRepository = new AccountRepository(database, accountMapper);
+        accountRepository = new AccountRepository(database);
     }
 
     @Test

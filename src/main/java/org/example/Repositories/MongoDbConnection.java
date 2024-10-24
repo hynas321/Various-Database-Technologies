@@ -5,9 +5,9 @@ import com.mongodb.MongoCredential;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.UuidRepresentation;
-import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
@@ -22,7 +22,7 @@ public class MongoDbConnection {
         MongoCredential credential = MongoCredential.createCredential(
                 "admin", "admin", "adminpassword".toCharArray());
 
-        CodecRegistry pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
+        CodecRegistry pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().register("org.example.Entities").automatic(true).build());
         CodecRegistry codecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), pojoCodecRegistry);
 
         MongoClientSettings settings = MongoClientSettings.builder()
@@ -38,6 +38,10 @@ public class MongoDbConnection {
 
     public MongoDatabase getDatabase() {
         return database;
+    }
+
+    public <T> MongoCollection<T> getCollection(String collectionName, Class<T> clazz) {
+        return database.getCollection(collectionName, clazz);
     }
 
     public void close() {

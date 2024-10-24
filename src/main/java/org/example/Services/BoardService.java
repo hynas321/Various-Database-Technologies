@@ -1,5 +1,6 @@
 package org.example.Services;
 
+import org.bson.types.ObjectId;
 import org.example.Entities.Board;
 import org.example.Entities.Account;
 import org.example.Entities.Admin;
@@ -30,7 +31,7 @@ public class BoardService implements IBoardService {
     }
 
     @Override
-    public boolean deleteBoard(String boardId, String userId) {
+    public boolean deleteBoard(ObjectId boardId, ObjectId userId) {
         try {
             Board board = boardRepository.getById(boardId);
             Account account = accountRepository.getById(userId);
@@ -65,7 +66,7 @@ public class BoardService implements IBoardService {
     }
 
     @Override
-    public Board getBoardById(String boardId) {
+    public Board getBoardById(ObjectId boardId) {
         try {
             return boardRepository.getById(boardId);
         } catch (Exception e) {
@@ -85,7 +86,7 @@ public class BoardService implements IBoardService {
     }
 
     @Override
-    public boolean addUserToBoard(String boardId, String userId) {
+    public boolean addUserToBoard(ObjectId boardId, ObjectId userId) {
         try {
             Board board = boardRepository.getById(boardId);
             Account account = accountRepository.getById(userId);
@@ -104,7 +105,7 @@ public class BoardService implements IBoardService {
     }
 
     @Override
-    public boolean removeUserFromBoard(String boardId, String userId) {
+    public boolean removeUserFromBoard(ObjectId boardId, ObjectId userId) {
         try {
             Board board = boardRepository.getById(boardId);
             Account account = accountRepository.getById(userId);

@@ -1,24 +1,39 @@
 package org.example.Entities;
 
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.types.ObjectId;
+
 public class Comment {
-    private String id;
+
+    @BsonId
+    private ObjectId id;
+
+    @BsonProperty("content")
     private String content;
-    private String postId;
-    private String creatorId;
 
-    public Comment() {}
+    @BsonProperty("postId")
+    private ObjectId postId;
 
-    public Comment(String content, String postId, String creatorId) {
+    @BsonProperty("creatorId")
+    private ObjectId creatorId;
+
+    @BsonCreator
+    public Comment(
+            @BsonProperty("content") String content,
+            @BsonProperty("postId") ObjectId postId,
+            @BsonProperty("creatorId") ObjectId creatorId) {
         this.content = content;
         this.postId = postId;
         this.creatorId = creatorId;
     }
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 
@@ -30,19 +45,19 @@ public class Comment {
         this.content = content;
     }
 
-    public String getPostId() {
+    public ObjectId getPostId() {
         return postId;
     }
 
-    public void setPostId(String postId) {
+    public void setPostId(ObjectId postId) {
         this.postId = postId;
     }
 
-    public String getCreatorId() {
+    public ObjectId getCreatorId() {
         return creatorId;
     }
 
-    public void setCreatorId(String creatorId) {
+    public void setCreatorId(ObjectId creatorId) {
         this.creatorId = creatorId;
     }
 }

@@ -3,8 +3,6 @@ import org.example.Entities.Post;
 import org.example.Entities.Account;
 import org.example.Entities.User;
 import org.example.Entities.Admin;
-import org.example.Mappers.AccountMapper;
-import org.example.Mappers.BoardMapper;
 import org.example.Repositories.BoardRepository;
 import org.example.Repositories.EntityRepository;
 import org.example.Repositories.AccountRepository;
@@ -24,10 +22,8 @@ class BoardRepositoryTest extends BaseRepositoryTest {
     @Override
     public void setUp() {
         super.setUp();
-        AccountMapper accountMapper = new AccountMapper();
-        BoardMapper boardMapper = new BoardMapper();
-        accountRepository = new AccountRepository(database, accountMapper);
-        boardRepository = new BoardRepository(database, boardMapper);
+        accountRepository = new AccountRepository(database);
+        boardRepository = new BoardRepository(database);
     }
 
     @Test

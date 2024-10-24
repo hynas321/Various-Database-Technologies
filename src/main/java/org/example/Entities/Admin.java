@@ -1,9 +1,16 @@
 package org.example.Entities;
 
-public class Admin extends Account {
-    public Admin() {}
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 
-    public Admin(String email, String password) {
-        super(email, password);
+@BsonDiscriminator(key = "type", value = "Admin")
+public class Admin extends Account {
+
+    @BsonCreator
+    public Admin(
+            @BsonProperty("email") String email,
+            @BsonProperty("accountPassword") String accountPassword) {
+        super(email, accountPassword);
     }
 }

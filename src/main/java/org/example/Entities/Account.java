@@ -1,27 +1,44 @@
 package org.example.Entities;
 
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
+import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.types.ObjectId;
+
 import java.util.HashSet;
 import java.util.Set;
 
+@BsonDiscriminator(key = "type", value = "Account")
 public abstract class Account {
-    private String id;
+    @BsonId
+    private ObjectId id;
+
+    @BsonProperty("email")
     private String email;
-    private String password;
-    private Set<String> postIds = new HashSet<>();
-    private Set<String> boardIds = new HashSet<>();
 
-    public Account() {}
+    @BsonProperty("accountPassword")
+    private String accountPassword;
 
-    public Account(String email, String password) {
+    @BsonProperty("postIds")
+    private Set<ObjectId> postIds = new HashSet<>();
+
+    @BsonProperty("boardIds")
+    private Set<ObjectId> boardIds = new HashSet<>();
+
+    @BsonCreator
+    public Account(
+            @BsonProperty("email") String email,
+            @BsonProperty("accountPassword") String accountPassword) {
         this.email = email;
-        this.password = password;
+        this.accountPassword = accountPassword;
     }
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 
@@ -33,27 +50,27 @@ public abstract class Account {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getAccountPassword() {
+        return accountPassword;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setAccountPassword(String accountPassword) {
+        this.accountPassword = accountPassword;
     }
 
-    public Set<String> getPostIds() {
+    public Set<ObjectId> getPostIds() {
         return postIds;
     }
 
-    public void setPostIds(Set<String> postIds) {
+    public void setPostIds(Set<ObjectId> postIds) {
         this.postIds = postIds;
     }
 
-    public Set<String> getBoardIds() {
+    public Set<ObjectId> getBoardIds() {
         return boardIds;
     }
 
-    public void setBoardIds(Set<String> boardIds) {
+    public void setBoardIds(Set<ObjectId> boardIds) {
         this.boardIds = boardIds;
     }
 }

@@ -26,7 +26,7 @@ class PostRepositoryTest extends BaseRepositoryTest {
         super.setUp();
 
         postRepository = new PostRepository(database);
-        accountRepository = new AccountRepository(database);
+        accountRepository = new AccountRepository(database, redisCache);
         boardRepository = new BoardRepository(database);
     }
 

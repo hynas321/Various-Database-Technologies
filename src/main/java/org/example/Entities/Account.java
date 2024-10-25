@@ -26,6 +26,8 @@ public abstract class Account {
     @BsonProperty("boardIds")
     private Set<ObjectId> boardIds = new HashSet<>();
 
+    public Account() {}
+
     @BsonCreator
     public Account(
             @BsonProperty("email") String email,

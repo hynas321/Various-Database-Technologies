@@ -7,6 +7,10 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 @BsonDiscriminator(key = "type", value = "User")
 public class User extends Account {
 
+    public User() {
+
+    }
+
     @BsonCreator
     public User(
             @BsonProperty("email") String email,

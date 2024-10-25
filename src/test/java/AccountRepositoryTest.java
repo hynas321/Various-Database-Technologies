@@ -16,8 +16,10 @@ class AccountRepositoryTest extends BaseRepositoryTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        accountRepository = new AccountRepository(database);
+
+        accountRepository = new AccountRepository(database, redisCache);
     }
+
 
     @Test
     void create_ShouldSaveUser() {

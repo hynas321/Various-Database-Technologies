@@ -29,7 +29,7 @@ class CommentRepositoryTest extends BaseRepositoryTest {
         super.setUp();
 
         commentRepository = new CommentRepository(database);
-        accountRepository = new AccountRepository(database);
+        accountRepository = new AccountRepository(database, redisCache);
         postRepository = new PostRepository(database);
         boardRepository = new BoardRepository(database);
     }

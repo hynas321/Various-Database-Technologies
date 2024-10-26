@@ -5,7 +5,6 @@ import com.mongodb.MongoCredential;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.UuidRepresentation;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -38,10 +37,6 @@ public class MongoDbConnection {
 
     public MongoDatabase getDatabase() {
         return database;
-    }
-
-    public <T> MongoCollection<T> getCollection(String collectionName, Class<T> clazz) {
-        return database.getCollection(collectionName, clazz);
     }
 
     public void close() {

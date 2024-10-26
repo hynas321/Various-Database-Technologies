@@ -1,17 +1,30 @@
 package org.example.Entities;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
+import org.example.Redis.ObjectIdDeserializer;
+import org.example.Redis.ObjectIdSerializer;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @BsonDiscriminator(key = "type", value = "Account")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Admin.class, name = "Admin"),
+        @JsonSubTypes.Type(value = User.class, name = "User")
+})
 public abstract class Account {
     @BsonId
+    @JsonSerialize(using = ObjectIdSerializer.class)
+    @JsonDeserialize(using = ObjectIdDeserializer.class)
     private ObjectId id;
 
     @BsonProperty("email")

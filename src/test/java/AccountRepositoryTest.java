@@ -17,7 +17,7 @@ class AccountRepositoryTest extends BaseRepositoryTest {
     public void setUp() {
         super.setUp();
 
-        accountRepository = new AccountRepository(database, redisCache);
+        accountRepository = new AccountRepository(database);
     }
 
 

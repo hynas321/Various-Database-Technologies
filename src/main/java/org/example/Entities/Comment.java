@@ -1,13 +1,19 @@
 package org.example.Entities;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
+import org.example.Redis.ObjectIdDeserializer;
+import org.example.Redis.ObjectIdSerializer;
 
 public class Comment {
 
     @BsonId
+    @JsonSerialize(using = ObjectIdSerializer.class)
+    @JsonDeserialize(using = ObjectIdDeserializer.class)
     private ObjectId id;
 
     @BsonProperty("content")
@@ -18,6 +24,8 @@ public class Comment {
 
     @BsonProperty("creatorId")
     private ObjectId creatorId;
+
+    public Comment() {}
 
     @BsonCreator
     public Comment(

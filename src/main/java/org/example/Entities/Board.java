@@ -1,9 +1,13 @@
 package org.example.Entities;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
+import org.example.Redis.ObjectIdDeserializer;
+import org.example.Redis.ObjectIdSerializer;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,6 +15,8 @@ import java.util.Set;
 public class Board {
 
     @BsonId
+    @JsonSerialize(using = ObjectIdSerializer.class)
+    @JsonDeserialize(using = ObjectIdDeserializer.class)
     private ObjectId id;
 
     @BsonProperty("name")
@@ -21,6 +27,8 @@ public class Board {
 
     @BsonProperty("memberIds")
     private Set<ObjectId> memberIds = new HashSet<>();
+
+    public Board() {}
 
     @BsonCreator
     public Board(@BsonProperty("name") String name) {

@@ -29,9 +29,9 @@ class CommentRepositoryTest extends BaseRepositoryTest {
         super.setUp();
 
         commentRepository = new CommentRepository(database);
-        accountRepository = new AccountRepository(database, redisCache);
+        accountRepository = new AccountRepository(database);
         postRepository = new PostRepository(database);
-        boardRepository = new BoardRepository(database);
+        boardRepository = new BoardRepository(database, redisCache);
     }
 
     @Test

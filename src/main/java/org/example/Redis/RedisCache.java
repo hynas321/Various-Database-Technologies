@@ -21,11 +21,10 @@ public class RedisCache {
 
     public RedisCache() {
         Properties properties = loadProperties();
-        String host = properties.getProperty("redis.host");
-        int port = Integer.parseInt(properties.getProperty("redis.port"));
+        String uri = properties.getProperty("redis.uri");
         String password = properties.getProperty("redis.password");
 
-        this.jedis = new Jedis(host, port);
+        this.jedis = new Jedis(uri);
         this.jedis.auth(password);
         this.objectMapper = new ObjectMapper();
 

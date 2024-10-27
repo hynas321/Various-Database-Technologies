@@ -3,6 +3,7 @@ import org.example.Entities.Post;
 import org.example.Entities.Account;
 import org.example.Entities.User;
 import org.example.Entities.Admin;
+import org.example.Redis.RedisBoardDecorator;
 import org.example.Repositories.BoardRepository;
 import org.example.Repositories.EntityRepository;
 import org.example.Repositories.AccountRepository;
@@ -23,7 +24,7 @@ class BoardRepositoryTest extends BaseRepositoryTest {
     public void setUp() {
         super.setUp();
         accountRepository = new AccountRepository(database);
-        boardRepository = new BoardRepository(database, redisCache);
+        boardRepository = new RedisBoardDecorator(new BoardRepository(database), redisCache);
     }
 
     @Test

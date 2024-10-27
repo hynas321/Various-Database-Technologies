@@ -1,5 +1,4 @@
 import com.mongodb.client.MongoDatabase;
-import jakarta.json.bind.JsonbBuilder;
 import org.example.Redis.RedisCache;
 import org.example.Repositories.MongoDbConnection;
 import org.junit.jupiter.api.AfterEach;
@@ -14,7 +13,7 @@ public abstract class BaseRepositoryTest {
     public void setUp() {
         mongoDbConnection = new MongoDbConnection("mongodb://mongodb1:27017,mongodb2:27018,mongodb3:27019/?replicaSet=replica_set_single", "testDatabase");
         database = mongoDbConnection.getDatabase();
-        redisCache = new RedisCache("localhost", 6379, "master123");
+        redisCache = new RedisCache();
     }
 
     @AfterEach

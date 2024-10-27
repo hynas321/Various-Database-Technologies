@@ -4,6 +4,7 @@ import org.example.Entities.Post;
 import org.example.Entities.Account;
 import org.example.Entities.User;
 import org.example.Entities.Admin;
+import org.example.Redis.RedisBoardDecorator;
 import org.example.Repositories.BoardRepository;
 import org.example.Repositories.CommentRepository;
 import org.example.Repositories.EntityRepository;
@@ -31,7 +32,7 @@ class CommentRepositoryTest extends BaseRepositoryTest {
         commentRepository = new CommentRepository(database);
         accountRepository = new AccountRepository(database);
         postRepository = new PostRepository(database);
-        boardRepository = new BoardRepository(database, redisCache);
+        boardRepository = new RedisBoardDecorator(new BoardRepository(mongoDbConnection.getDatabase()), redisCache);
     }
 
     @Test

@@ -1,18 +1,17 @@
 package org.example.Services;
 
-import org.bson.types.ObjectId;
 import org.example.Entities.Account;
-import org.example.Entities.Admin;
-import org.example.Entities.User;
-import org.example.Repositories.EntityRepository;
+import org.example.Entities.Account.UserType;
+import org.example.Repositories.AccountRepository;
 import org.example.Services.Interfaces.IAccountService;
 
 import java.util.List;
+import java.util.UUID;
 
 public class AccountService implements IAccountService {
-    private final EntityRepository<Account> accountRepository;
+    private final AccountRepository accountRepository;
 
-    public AccountService(EntityRepository<Account> accountRepository) {
+    public AccountService(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
 
@@ -23,7 +22,8 @@ public class AccountService implements IAccountService {
                 return null;
             }
 
-            Account account = isAdmin ? new Admin(email, password) : new User(email, password);
+            UserType userType = isAdmin ? UserType.ADMIN : UserType.USER;
+            Account account = new Account(email, password, userType);
             accountRepository.create(account);
 
             return account;
@@ -34,7 +34,7 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    public boolean deleteAccount(ObjectId accountId) {
+    public boolean deleteAccount(UUID accountId) {
         try {
             Account account = accountRepository.getById(accountId);
             if (account == null) {
@@ -52,7 +52,7 @@ public class AccountService implements IAccountService {
     @Override
     public boolean updateAccount(Account account) {
         try {
-            Account existingAccount = accountRepository.getById(account.getId());
+            Account existingAccount = accountRepository.getById(account.getUserId());
             if (existingAccount == null) {
                 return false;
             }
@@ -66,7 +66,7 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    public Account getAccountById(ObjectId accountId) {
+    public Account getAccountById(UUID accountId) {
         return accountRepository.getById(accountId);
     }
 

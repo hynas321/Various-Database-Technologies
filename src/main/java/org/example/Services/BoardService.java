@@ -1,13 +1,12 @@
 package org.example.Services;
 
-import org.bson.types.ObjectId;
 import org.example.Entities.Board;
 import org.example.Entities.Account;
-import org.example.Entities.Admin;
 import org.example.Repositories.EntityRepository;
 import org.example.Services.Interfaces.IBoardService;
 
 import java.util.List;
+import java.util.UUID;
 
 public class BoardService implements IBoardService {
     private final EntityRepository<Board> boardRepository;
@@ -31,12 +30,13 @@ public class BoardService implements IBoardService {
     }
 
     @Override
-    public boolean deleteBoard(ObjectId boardId, ObjectId userId) {
+    public boolean deleteBoard(UUID boardId, UUID userId) {
         try {
             Board board = boardRepository.getById(boardId);
             Account account = accountRepository.getById(userId);
 
-            if (board == null || account == null || (!(account instanceof Admin) && !board.getMemberIds().contains(userId))) {
+            if (board == null || account == null ||
+                    (!account.getUserType().equals("ADMIN") && !board.getMemberIds().contains(userId))) {
                 return false;
             }
 
@@ -66,7 +66,7 @@ public class BoardService implements IBoardService {
     }
 
     @Override
-    public Board getBoardById(ObjectId boardId) {
+    public Board getBoardById(UUID boardId) {
         try {
             return boardRepository.getById(boardId);
         } catch (Exception e) {
@@ -86,7 +86,7 @@ public class BoardService implements IBoardService {
     }
 
     @Override
-    public boolean addUserToBoard(ObjectId boardId, ObjectId userId) {
+    public boolean addUserToBoard(UUID boardId, UUID userId) {
         try {
             Board board = boardRepository.getById(boardId);
             Account account = accountRepository.getById(userId);
@@ -105,7 +105,7 @@ public class BoardService implements IBoardService {
     }
 
     @Override
-    public boolean removeUserFromBoard(ObjectId boardId, ObjectId userId) {
+    public boolean removeUserFromBoard(UUID boardId, UUID userId) {
         try {
             Board board = boardRepository.getById(boardId);
             Account account = accountRepository.getById(userId);

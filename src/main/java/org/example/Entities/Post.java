@@ -1,53 +1,45 @@
 package org.example.Entities;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonId;
-import org.bson.codecs.pojo.annotations.BsonProperty;
-import org.bson.types.ObjectId;
-import org.example.Redis.ObjectIdDeserializer;
-import org.example.Redis.ObjectIdSerializer;
-
+import com.datastax.oss.driver.api.mapper.annotations.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
+@Entity
+@CqlName("posts")
 public class Post {
 
-    @BsonId
-    @JsonSerialize(using = ObjectIdSerializer.class)
-    @JsonDeserialize(using = ObjectIdDeserializer.class)
-    private ObjectId id;
+    @PartitionKey
+    private UUID id;
 
-    @BsonProperty("content")
+    @CqlName("content")
     private String content;
 
-    @BsonProperty("creatorId")
-    private ObjectId creatorId;
+    @CqlName("creator_id")
+    private UUID creatorId;
 
-    @BsonProperty("boardId")
-    private ObjectId boardId;
+    @CqlName("board_id")
+    private UUID boardId;
 
-    @BsonProperty("commentIds")
-    private Set<ObjectId> commentIds = new HashSet<>();
+    @CqlName("comment_ids")
+    private Set<UUID> commentIds = new HashSet<>();
 
-    public Post() {}
+    public Post() {
+        this.id = UUID.randomUUID();
+    }
 
-    @BsonCreator
-    public Post(
-            @BsonProperty("content") String content,
-            @BsonProperty("creatorId") ObjectId creatorId,
-            @BsonProperty("boardId") ObjectId boardId) {
+    public Post(String content, UUID creatorId, UUID boardId) {
+        this.id = UUID.randomUUID();
         this.content = content;
         this.creatorId = creatorId;
         this.boardId = boardId;
     }
 
-    public ObjectId getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -59,27 +51,27 @@ public class Post {
         this.content = content;
     }
 
-    public ObjectId getCreatorId() {
+    public UUID getCreatorId() {
         return creatorId;
     }
 
-    public void setCreatorId(ObjectId creatorId) {
+    public void setCreatorId(UUID creatorId) {
         this.creatorId = creatorId;
     }
 
-    public ObjectId getBoardId() {
+    public UUID getBoardId() {
         return boardId;
     }
 
-    public void setBoardId(ObjectId boardId) {
+    public void setBoardId(UUID boardId) {
         this.boardId = boardId;
     }
 
-    public Set<ObjectId> getCommentIds() {
+    public Set<UUID> getCommentIds() {
         return commentIds;
     }
 
-    public void setCommentIds(Set<ObjectId> commentIds) {
+    public void setCommentIds(Set<UUID> commentIds) {
         this.commentIds = commentIds;
     }
 }

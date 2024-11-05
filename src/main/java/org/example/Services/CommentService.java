@@ -1,11 +1,11 @@
 package org.example.Services;
 
-import org.bson.types.ObjectId;
 import org.example.Entities.Comment;
 import org.example.Repositories.EntityRepository;
 import org.example.Services.Interfaces.ICommentService;
 
 import java.util.List;
+import java.util.UUID;
 
 public class CommentService implements ICommentService {
     private final EntityRepository<Comment> commentRepository;
@@ -15,7 +15,7 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public Comment addComment(ObjectId postId, ObjectId userId, String content) {
+    public Comment addComment(UUID postId, UUID userId, String content) {
         try {
             Comment comment = new Comment(content, postId, userId);
             commentRepository.create(comment);
@@ -27,7 +27,7 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public boolean deleteComment(ObjectId commentId, ObjectId userId) {
+    public boolean deleteComment(UUID commentId, UUID userId) {
         try {
             Comment comment = commentRepository.getById(commentId);
             if (comment == null || !comment.getCreatorId().equals(userId)) {
@@ -43,7 +43,7 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public boolean updateComment(Comment comment, ObjectId userId) {
+    public boolean updateComment(Comment comment, UUID userId) {
         try {
             Comment existingComment = commentRepository.getById(comment.getId());
             if (existingComment == null || !existingComment.getCreatorId().equals(userId)) {
@@ -59,7 +59,7 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public Comment getCommentById(ObjectId commentId) {
+    public Comment getCommentById(UUID commentId) {
         return commentRepository.getById(commentId);
     }
 

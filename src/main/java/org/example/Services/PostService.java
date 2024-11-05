@@ -1,11 +1,11 @@
 package org.example.Services;
 
-import org.bson.types.ObjectId;
 import org.example.Entities.Post;
 import org.example.Repositories.EntityRepository;
 import org.example.Services.Interfaces.IPostService;
 
 import java.util.List;
+import java.util.UUID;
 
 public class PostService implements IPostService {
     private final EntityRepository<Post> postRepository;
@@ -15,7 +15,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public Post createPost(ObjectId userId, ObjectId boardId, String content) {
+    public Post createPost(UUID userId, UUID boardId, String content) {
         try {
             Post post = new Post(content, userId, boardId);
             postRepository.create(post);
@@ -27,7 +27,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public boolean deletePost(ObjectId postId, ObjectId userId) {
+    public boolean deletePost(UUID postId, UUID userId) {
         try {
             Post post = postRepository.getById(postId);
             if (post == null || !post.getCreatorId().equals(userId)) {
@@ -43,7 +43,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public boolean updatePost(Post post, ObjectId userId) {
+    public boolean updatePost(Post post, UUID userId) {
         try {
             Post existingPost = postRepository.getById(post.getId());
             if (existingPost == null || !existingPost.getCreatorId().equals(userId)) {
@@ -59,7 +59,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public Post getPostById(ObjectId postId) {
+    public Post getPostById(UUID postId) {
         return postRepository.getById(postId);
     }
 

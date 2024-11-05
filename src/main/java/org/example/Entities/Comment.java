@@ -1,47 +1,40 @@
 package org.example.Entities;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonId;
-import org.bson.codecs.pojo.annotations.BsonProperty;
-import org.bson.types.ObjectId;
-import org.example.Redis.ObjectIdDeserializer;
-import org.example.Redis.ObjectIdSerializer;
+import com.datastax.oss.driver.api.mapper.annotations.*;
+import java.util.UUID;
 
+@Entity
+@CqlName("comments")
 public class Comment {
 
-    @BsonId
-    @JsonSerialize(using = ObjectIdSerializer.class)
-    @JsonDeserialize(using = ObjectIdDeserializer.class)
-    private ObjectId id;
+    @PartitionKey
+    private UUID id;
 
-    @BsonProperty("content")
+    @CqlName("content")
     private String content;
 
-    @BsonProperty("postId")
-    private ObjectId postId;
+    @CqlName("post_id")
+    private UUID postId;
 
-    @BsonProperty("creatorId")
-    private ObjectId creatorId;
+    @CqlName("creator_id")
+    private UUID creatorId;
 
-    public Comment() {}
+    public Comment() {
+        this.id = UUID.randomUUID();
+    }
 
-    @BsonCreator
-    public Comment(
-            @BsonProperty("content") String content,
-            @BsonProperty("postId") ObjectId postId,
-            @BsonProperty("creatorId") ObjectId creatorId) {
+    public Comment(String content, UUID postId, UUID creatorId) {
+        this.id = UUID.randomUUID();
         this.content = content;
         this.postId = postId;
         this.creatorId = creatorId;
     }
 
-    public ObjectId getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -53,19 +46,19 @@ public class Comment {
         this.content = content;
     }
 
-    public ObjectId getPostId() {
+    public UUID getPostId() {
         return postId;
     }
 
-    public void setPostId(ObjectId postId) {
+    public void setPostId(UUID postId) {
         this.postId = postId;
     }
 
-    public ObjectId getCreatorId() {
+    public UUID getCreatorId() {
         return creatorId;
     }
 
-    public void setCreatorId(ObjectId creatorId) {
+    public void setCreatorId(UUID creatorId) {
         this.creatorId = creatorId;
     }
 }

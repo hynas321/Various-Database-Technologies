@@ -1,54 +1,62 @@
 package org.example.Repositories;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import org.bson.types.ObjectId;
+import com.datastax.oss.driver.api.core.CqlIdentifier;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.type.DataTypes;
+import com.datastax.oss.driver.api.querybuilder.SchemaBuilder;
+import org.example.Dao.AccountDao;
 import org.example.Entities.Account;
-import org.example.Entities.Admin;
-import org.example.Entities.User;
+import org.example.Mappers.RepositoryMapper;
+import org.example.Mappers.RepositoryMapperBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.mongodb.client.model.Filters.eq;
+import java.util.UUID;
 
 public class AccountRepository implements EntityRepository<Account> {
-    private final MongoCollection<Account> collection;
 
-    public AccountRepository(MongoDatabase database) {
-        this.collection = database.getCollection("accounts", Account.class);
+    private final AccountDao accountDao;
+
+    public AccountRepository(CqlSession session, CqlIdentifier keyspace) {
+        setTables(session, keyspace);
+
+        RepositoryMapper builder = new RepositoryMapperBuilder(session).build();;
+        this.accountDao = builder.accountDao(keyspace);
     }
 
     @Override
     public void create(Account account) {
-        collection.insertOne(account);
+        accountDao.create(account);
     }
 
     @Override
-    public Account getById(ObjectId id) {
-        return collection.find(eq("_id", id)).first();
+    public Account getById(UUID id) {
+        return accountDao.getById(id);
     }
 
     @Override
     public List<Account> getAll() {
-        List<Account> accounts = new ArrayList<>();
-
-        List<User> users = collection.find(eq("type", "User"), User.class).into(new ArrayList<>());
-        List<Admin> admins = collection.find(eq("type", "Admin"), Admin.class).into(new ArrayList<>());
-
-        accounts.addAll(users);
-        accounts.addAll(admins);
-
-        return accounts;
+        return accountDao.getAll();
     }
 
     @Override
     public void update(Account account) {
-        collection.replaceOne(eq("_id", account.getId()), account);
+        accountDao.update(account);
     }
 
     @Override
     public void delete(Account account) {
-        collection.deleteOne(eq("_id", account.getId()));
+        accountDao.delete(account);
+    }
+
+    private static void setTables(CqlSession session, CqlIdentifier keyspace) {
+        session.execute(SchemaBuilder.createTable(keyspace, CqlIdentifier.fromCql("accounts"))
+                .ifNotExists()
+                .withPartitionKey(CqlIdentifier.fromCql("userId"), DataTypes.UUID)
+                .withColumn(CqlIdentifier.fromCql("email"), DataTypes.TEXT)
+                .withColumn(CqlIdentifier.fromCql("password"), DataTypes.TEXT)
+                .withClusteringColumn(CqlIdentifier.fromCql("user_type"), DataTypes.TEXT)
+                .withColumn(CqlIdentifier.fromCql("post_ids"), DataTypes.setOf(DataTypes.UUID))
+                .withColumn(CqlIdentifier.fromCql("board_ids"), DataTypes.setOf(DataTypes.UUID))
+                .build());
     }
 }

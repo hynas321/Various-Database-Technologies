@@ -1,44 +1,60 @@
 package org.example.Repositories;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import org.bson.types.ObjectId;
+import com.datastax.oss.driver.api.core.CqlIdentifier;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.type.DataTypes;
+import com.datastax.oss.driver.api.querybuilder.SchemaBuilder;
+import org.example.Dao.BoardDao;
 import org.example.Entities.Board;
+import org.example.Mappers.RepositoryMapper;
+import org.example.Mappers.RepositoryMapperBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.mongodb.client.model.Filters.eq;
+import java.util.UUID;
 
 public class BoardRepository implements EntityRepository<Board> {
-    private final MongoCollection<Board> collection;
 
-    public BoardRepository(MongoDatabase database) {
-        this.collection = database.getCollection("boards", Board.class);
+    private final BoardDao boardDao;
+
+    public BoardRepository(CqlSession session, CqlIdentifier keyspace) {
+        setTables(session, keyspace);
+
+        RepositoryMapper repositoryMapper = new RepositoryMapperBuilder(session).build();;
+        this.boardDao = repositoryMapper.boardDao(keyspace);
     }
 
     @Override
     public void create(Board board) {
-        collection.insertOne(board);
+        boardDao.create(board);
     }
 
     @Override
-    public Board getById(ObjectId id) {
-        return collection.find(eq("_id", id)).first();
+    public Board getById(UUID id) {
+        return boardDao.getById(id);
     }
 
     @Override
     public List<Board> getAll() {
-        return collection.find().into(new ArrayList<>());
+        return boardDao.getAll();
     }
 
     @Override
     public void update(Board board) {
-        collection.replaceOne(eq("_id", board.getId()), board);
+        boardDao.update(board);
     }
 
     @Override
     public void delete(Board board) {
-        collection.deleteOne(eq("_id", board.getId()));
+        boardDao.delete(board);
+    }
+
+    private static void setTables(CqlSession session, CqlIdentifier keyspace) {
+        session.execute(SchemaBuilder.createTable(keyspace, CqlIdentifier.fromCql("boards"))
+                .ifNotExists()
+                .withPartitionKey(CqlIdentifier.fromCql("id"), DataTypes.UUID)
+                .withColumn(CqlIdentifier.fromCql("name"), DataTypes.TEXT)
+                .withColumn(CqlIdentifier.fromCql("post_ids"), DataTypes.setOf(DataTypes.UUID))
+                .withColumn(CqlIdentifier.fromCql("member_ids"), DataTypes.setOf(DataTypes.UUID))
+                .build());
     }
 }

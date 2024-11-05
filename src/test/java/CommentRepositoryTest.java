@@ -1,10 +1,8 @@
+import com.datastax.oss.driver.api.core.CqlIdentifier;
 import org.example.Entities.Board;
 import org.example.Entities.Comment;
 import org.example.Entities.Post;
 import org.example.Entities.Account;
-import org.example.Entities.User;
-import org.example.Entities.Admin;
-import org.example.Redis.RedisBoardDecorator;
 import org.example.Repositories.BoardRepository;
 import org.example.Repositories.CommentRepository;
 import org.example.Repositories.EntityRepository;
@@ -14,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,66 +28,66 @@ class CommentRepositoryTest extends BaseRepositoryTest {
     public void setUp() {
         super.setUp();
 
-        commentRepository = new CommentRepository(database);
-        accountRepository = new AccountRepository(database);
-        postRepository = new PostRepository(database);
-        boardRepository = new RedisBoardDecorator(new BoardRepository(mongoDbConnection.getDatabase()), redisCache);
+        commentRepository = new CommentRepository(session, CqlIdentifier.fromCql("site"));
+        accountRepository = new AccountRepository(session, CqlIdentifier.fromCql("site"));
+        postRepository = new PostRepository(session, CqlIdentifier.fromCql("site"));
+        boardRepository = new BoardRepository(session, CqlIdentifier.fromCql("site"));
     }
 
     @Test
     void create_ShouldSaveCommentByUser() {
-        User user = new User("comment_user@example.com", "password123");
+        Account user = new Account("comment_user@example.com", "password123", Account.UserType.USER);
         accountRepository.create(user);
 
         Board board = new Board("Board for Post");
         boardRepository.create(board);
 
-        Post post = new Post("Post for Comment", user.getId(), board.getId());
+        Post post = new Post("Post for Comment", user.getUserId(), board.getId());
         postRepository.create(post);
 
-        Comment comment = new Comment("Test comment content", post.getId(), user.getId());
+        Comment comment = new Comment("Test comment content", post.getId(), user.getUserId());
         commentRepository.create(comment);
 
         Comment retrievedComment = commentRepository.getById(comment.getId());
         assertNotNull(retrievedComment);
         assertEquals("Test comment content", retrievedComment.getContent());
         assertEquals(post.getId(), retrievedComment.getPostId());
-        assertEquals(user.getId(), retrievedComment.getCreatorId());
+        assertEquals(user.getUserId(), retrievedComment.getCreatorId());
     }
 
     @Test
     void create_ShouldSaveCommentByAdmin() {
-        Admin admin = new Admin("admin_comment@example.com", "adminpassword123");
+        Account admin = new Account("admin_comment@example.com", "adminpassword123", Account.UserType.ADMIN);
         accountRepository.create(admin);
 
         Board board = new Board("Board for Admin Comment");
         boardRepository.create(board);
 
-        Post post = new Post("Post for Admin Comment", admin.getId(), board.getId());
+        Post post = new Post("Post for Admin Comment", admin.getUserId(), board.getId());
         postRepository.create(post);
 
-        Comment comment = new Comment("Admin comment content", post.getId(), admin.getId());
+        Comment comment = new Comment("Admin comment content", post.getId(), admin.getUserId());
         commentRepository.create(comment);
 
         Comment retrievedComment = commentRepository.getById(comment.getId());
         assertNotNull(retrievedComment);
         assertEquals("Admin comment content", retrievedComment.getContent());
         assertEquals(post.getId(), retrievedComment.getPostId());
-        assertEquals(admin.getId(), retrievedComment.getCreatorId());
+        assertEquals(admin.getUserId(), retrievedComment.getCreatorId());
     }
 
     @Test
     void getById_ShouldReturnComment() {
-        User user = new User("comment_user2@example.com", "password123");
+        Account user = new Account("comment_user2@example.com", "password123", Account.UserType.USER);
         accountRepository.create(user);
 
         Board board = new Board("Board for Another Post");
         boardRepository.create(board);
 
-        Post post = new Post("Another Post for Comment", user.getId(), board.getId());
+        Post post = new Post("Another Post for Comment", user.getUserId(), board.getId());
         postRepository.create(post);
 
-        Comment comment = new Comment("Another comment content", post.getId(), user.getId());
+        Comment comment = new Comment("Another comment content", post.getId(), user.getUserId());
         commentRepository.create(comment);
 
         Comment retrievedComment = commentRepository.getById(comment.getId());
@@ -98,42 +97,42 @@ class CommentRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void getAll_ShouldReturnListOfComments() {
-        User user = new User("comment_user3@example.com", "password123");
+        Account user = new Account("comment_user3@example.com", "password123", Account.UserType.USER);
         accountRepository.create(user);
 
-        Admin admin = new Admin("admin_user3@example.com", "adminpassword123");
+        Account admin = new Account("admin_user3@example.com", "adminpassword123", Account.UserType.ADMIN);
         accountRepository.create(admin);
 
         Board board = new Board("Board for Multiple Comments");
         boardRepository.create(board);
 
-        Post post = new Post("Post for Multiple Comments", user.getId(), board.getId());
+        Post post = new Post("Post for Multiple Comments", user.getUserId(), board.getId());
         postRepository.create(post);
 
-        Comment comment1 = new Comment("Comment 1 content", post.getId(), user.getId());
-        Comment comment2 = new Comment("Comment 2 content", post.getId(), admin.getId());
+        Comment comment1 = new Comment("Comment 1 content", post.getId(), user.getUserId());
+        Comment comment2 = new Comment("Comment 2 content", post.getId(), admin.getUserId());
 
         commentRepository.create(comment1);
         commentRepository.create(comment2);
 
         List<Comment> comments = commentRepository.getAll();
         assertFalse(comments.isEmpty());
-        assertTrue(comments.stream().anyMatch(comment -> comment.getCreatorId().equals(user.getId())));
-        assertTrue(comments.stream().anyMatch(comment -> comment.getCreatorId().equals(admin.getId())));
+        assertTrue(comments.stream().anyMatch(comment -> comment.getCreatorId().equals(user.getUserId())));
+        assertTrue(comments.stream().anyMatch(comment -> comment.getCreatorId().equals(admin.getUserId())));
     }
 
     @Test
     void update_ShouldUpdateCommentByUser() {
-        User user = new User("comment_user4@example.com", "password123");
+        Account user = new Account("comment_user4@example.com", "password123", Account.UserType.USER);
         accountRepository.create(user);
 
         Board board = new Board("Board for Updating Comment");
         boardRepository.create(board);
 
-        Post post = new Post("Post for Updating Comment", user.getId(), board.getId());
+        Post post = new Post("Post for Updating Comment", user.getUserId(), board.getId());
         postRepository.create(post);
 
-        Comment comment = new Comment("Original comment content", post.getId(), user.getId());
+        Comment comment = new Comment("Original comment content", post.getId(), user.getUserId());
         commentRepository.create(comment);
 
         comment.setContent("Updated comment content");
@@ -144,38 +143,17 @@ class CommentRepositoryTest extends BaseRepositoryTest {
     }
 
     @Test
-    void update_ShouldUpdateCommentByAdmin() {
-        Admin admin = new Admin("admin_user4@example.com", "adminpassword123");
-        accountRepository.create(admin);
-
-        Board board = new Board("Board for Updating Admin Comment");
-        boardRepository.create(board);
-
-        Post post = new Post("Post for Updating Admin Comment", admin.getId(), board.getId());
-        postRepository.create(post);
-
-        Comment comment = new Comment("Original admin comment content", post.getId(), admin.getId());
-        commentRepository.create(comment);
-
-        comment.setContent("Updated admin comment content");
-        commentRepository.update(comment);
-
-        Comment updatedComment = commentRepository.getById(comment.getId());
-        assertEquals("Updated admin comment content", updatedComment.getContent());
-    }
-
-    @Test
     void delete_ShouldDeleteCommentByUser() {
-        User user = new User("comment_user5@example.com", "password123");
+        Account user = new Account("comment_user5@example.com", "password123", Account.UserType.USER);
         accountRepository.create(user);
 
         Board board = new Board("Board for Deleting Comment");
         boardRepository.create(board);
 
-        Post post = new Post("Post for Deleting Comment", user.getId(), board.getId());
+        Post post = new Post("Post for Deleting Comment", user.getUserId(), board.getId());
         postRepository.create(post);
 
-        Comment comment = new Comment("Comment to delete", post.getId(), user.getId());
+        Comment comment = new Comment("Comment to delete", post.getId(), user.getUserId());
         commentRepository.create(comment);
 
         commentRepository.delete(comment);
@@ -186,16 +164,16 @@ class CommentRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void delete_ShouldDeleteCommentByAdmin() {
-        Admin admin = new Admin("admin_user5@example.com", "adminpassword123");
+        Account admin = new Account("admin_user5@example.com", "adminpassword123", Account.UserType.ADMIN);
         accountRepository.create(admin);
 
         Board board = new Board("Board for Deleting Admin Comment");
         boardRepository.create(board);
 
-        Post post = new Post("Post for Deleting Admin Comment", admin.getId(), board.getId());
+        Post post = new Post("Post for Deleting Admin Comment", admin.getUserId(), board.getId());
         postRepository.create(post);
 
-        Comment comment = new Comment("Admin comment to delete", post.getId(), admin.getId());
+        Comment comment = new Comment("Admin comment to delete", post.getId(), admin.getUserId());
         commentRepository.create(comment);
 
         commentRepository.delete(comment);

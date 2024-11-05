@@ -1,9 +1,7 @@
+import com.datastax.oss.driver.api.core.CqlIdentifier;
 import org.example.Entities.Board;
 import org.example.Entities.Post;
 import org.example.Entities.Account;
-import org.example.Entities.User;
-import org.example.Entities.Admin;
-import org.example.Redis.RedisBoardDecorator;
 import org.example.Repositories.BoardRepository;
 import org.example.Repositories.EntityRepository;
 import org.example.Repositories.AccountRepository;
@@ -23,8 +21,8 @@ class BoardRepositoryTest extends BaseRepositoryTest {
     @Override
     public void setUp() {
         super.setUp();
-        accountRepository = new AccountRepository(database);
-        boardRepository = new RedisBoardDecorator(new BoardRepository(database), redisCache);
+        accountRepository = new AccountRepository(session, CqlIdentifier.fromCql("site"));
+        boardRepository = new BoardRepository(session, CqlIdentifier.fromCql("site"));
     }
 
     @Test
@@ -39,7 +37,7 @@ class BoardRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void create_ShouldSaveBoardByUser() {
-        User user = new User("user1@example.com", "password123");
+        Account user = new Account("user1@example.com", "password123", Account.UserType.USER);
         accountRepository.create(user);
 
         Board board = new Board("User's Test Board");
@@ -52,7 +50,7 @@ class BoardRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void create_ShouldSaveBoardByAdmin() {
-        Admin admin = new Admin("admin_unique1@example.com", "adminpassword123");
+        Account admin = new Account("admin_unique1@example.com", "adminpassword123", Account.UserType.ADMIN);
         accountRepository.create(admin);
 
         Board board = new Board("Admin's Test Board");
@@ -110,11 +108,11 @@ class BoardRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void create_ShouldSaveBoardWithPostsByUser() {
-        User user = new User("user_unique2@example.com", "password123");
+        Account user = new Account("user_unique2@example.com", "password123", Account.UserType.USER);
         accountRepository.create(user);
 
         Board board = new Board("Board with Posts");
-        Post post = new Post("Post in Board", user.getId(), board.getId());
+        Post post = new Post("Post in Board", user.getUserId(), board.getId());
         board.getPostIds().add(post.getId());
 
         boardRepository.create(board);
@@ -126,11 +124,11 @@ class BoardRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void create_ShouldSaveBoardWithPostsByAdmin() {
-        Admin admin = new Admin("admin_unique2@example.com", "adminpassword123");
+        Account admin = new Account("admin_unique2@example.com", "adminpassword123", Account.UserType.ADMIN);
         accountRepository.create(admin);
 
         Board board = new Board("Admin Board with Posts");
-        Post post = new Post("Admin Post in Board", admin.getId(), board.getId());
+        Post post = new Post("Admin Post in Board", admin.getUserId(), board.getId());
         board.getPostIds().add(post.getId());
 
         boardRepository.create(board);

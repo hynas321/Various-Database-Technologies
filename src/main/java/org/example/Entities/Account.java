@@ -1,60 +1,52 @@
 package org.example.Entities;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonDiscriminator;
-import org.bson.codecs.pojo.annotations.BsonId;
-import org.bson.codecs.pojo.annotations.BsonProperty;
-import org.bson.types.ObjectId;
-import org.example.Redis.ObjectIdDeserializer;
-import org.example.Redis.ObjectIdSerializer;
-
+import com.datastax.oss.driver.api.mapper.annotations.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
-@BsonDiscriminator(key = "type", value = "Account")
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = Admin.class, name = "Admin"),
-        @JsonSubTypes.Type(value = User.class, name = "User")
-})
-public abstract class Account {
-    @BsonId
-    @JsonSerialize(using = ObjectIdSerializer.class)
-    @JsonDeserialize(using = ObjectIdDeserializer.class)
-    private ObjectId id;
+@Entity
+@CqlName("accounts")
+public class Account {
 
-    @BsonProperty("email")
+    public enum UserType {
+        USER, ADMIN
+    }
+
+    @PartitionKey
+    private UUID userId;
+
+    @CqlName("email")
     private String email;
 
-    @BsonProperty("accountPassword")
-    private String accountPassword;
+    private String password;
 
-    @BsonProperty("postIds")
-    private Set<ObjectId> postIds = new HashSet<>();
+    @ClusteringColumn
+    @CqlName("type")
+    private String userType;
 
-    @BsonProperty("boardIds")
-    private Set<ObjectId> boardIds = new HashSet<>();
+    @CqlName("post_ids")
+    private Set<UUID> postIds = new HashSet<>();
 
-    public Account() {}
+    @CqlName("board_ids")
+    private Set<UUID> boardIds = new HashSet<>();
 
-    @BsonCreator
-    public Account(
-            @BsonProperty("email") String email,
-            @BsonProperty("accountPassword") String accountPassword) {
+    public Account() {
+
+    }
+
+    public Account(String email, String password, UserType userType) {
         this.email = email;
-        this.accountPassword = accountPassword;
+        this.password = password;
+        this.userType = userType.name();
     }
 
-    public ObjectId getId() {
-        return id;
+    public UUID getUserId() {
+        return userId;
     }
 
-    public void setId(ObjectId id) {
-        this.id = id;
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
 
     public String getEmail() {
@@ -65,27 +57,35 @@ public abstract class Account {
         this.email = email;
     }
 
-    public String getAccountPassword() {
-        return accountPassword;
+    public String getPassword() {
+        return password;
     }
 
-    public void setAccountPassword(String accountPassword) {
-        this.accountPassword = accountPassword;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public Set<ObjectId> getPostIds() {
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType.name();
+    }
+
+    public Set<UUID> getPostIds() {
         return postIds;
     }
 
-    public void setPostIds(Set<ObjectId> postIds) {
+    public void setPostIds(Set<UUID> postIds) {
         this.postIds = postIds;
     }
 
-    public Set<ObjectId> getBoardIds() {
+    public Set<UUID> getBoardIds() {
         return boardIds;
     }
 
-    public void setBoardIds(Set<ObjectId> boardIds) {
+    public void setBoardIds(Set<UUID> boardIds) {
         this.boardIds = boardIds;
     }
 }

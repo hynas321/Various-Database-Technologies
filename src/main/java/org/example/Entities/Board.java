@@ -1,45 +1,40 @@
 package org.example.Entities;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonId;
-import org.bson.codecs.pojo.annotations.BsonProperty;
-import org.bson.types.ObjectId;
-import org.example.Redis.ObjectIdDeserializer;
-import org.example.Redis.ObjectIdSerializer;
-
+import com.datastax.oss.driver.api.mapper.annotations.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
+@Entity
+@CqlName("boards")
 public class Board {
 
-    @BsonId
-    @JsonSerialize(using = ObjectIdSerializer.class)
-    @JsonDeserialize(using = ObjectIdDeserializer.class)
-    private ObjectId id;
+    @PartitionKey
+    private UUID id;
 
-    @BsonProperty("name")
+    @CqlName("name")
     private String name;
 
-    @BsonProperty("postIds")
-    private Set<ObjectId> postIds = new HashSet<>();
+    @CqlName("post_ids")
+    private Set<UUID> postIds = new HashSet<>();
 
-    @BsonProperty("memberIds")
-    private Set<ObjectId> memberIds = new HashSet<>();
+    @CqlName("member_ids")
+    private Set<UUID> memberIds = new HashSet<>();
 
-    public Board() {}
+    public Board() {
+        this.id = UUID.randomUUID();
+    }
 
-    @BsonCreator
-    public Board(@BsonProperty("name") String name) {
+    public Board(String name) {
+        this.id = UUID.randomUUID();
         this.name = name;
     }
 
-    public ObjectId getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -51,19 +46,19 @@ public class Board {
         this.name = name;
     }
 
-    public Set<ObjectId> getPostIds() {
+    public Set<UUID> getPostIds() {
         return postIds;
     }
 
-    public void setPostIds(Set<ObjectId> postIds) {
+    public void setPostIds(Set<UUID> postIds) {
         this.postIds = postIds;
     }
 
-    public Set<ObjectId> getMemberIds() {
+    public Set<UUID> getMemberIds() {
         return memberIds;
     }
 
-    public void setMemberIds(Set<ObjectId> memberIds) {
+    public void setMemberIds(Set<UUID> memberIds) {
         this.memberIds = memberIds;
     }
 }

@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,49 +31,49 @@ class PostRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void create_ShouldSavePostByUser() {
-        Account user = new Account("user@example.com", "password123", Account.UserType.USER);
+        Account user = new Account("user@example.com", "password123", Account.AccountType.USER);
         accountRepository.create(user);
 
         Board board = new Board("Test Board");
         boardRepository.create(board);
 
-        Post post = new Post("Test Post content", user.getUserId(), board.getId());
+        Post post = new Post("Test Post content", user.getId(), board.getId());
         postRepository.create(post);
 
         Post retrievedPost = postRepository.getById(post.getId());
         assertNotNull(retrievedPost);
         assertEquals("Test Post content", retrievedPost.getContent());
-        assertEquals(user.getUserId(), retrievedPost.getCreatorId());
+        assertEquals(user.getId(), retrievedPost.getCreatorId());
         assertEquals(board.getId(), retrievedPost.getBoardId());
     }
 
     @Test
     void create_ShouldSavePostByAdmin() {
-        Account admin = new Account("admin@example.com", "adminpassword123", Account.UserType.ADMIN);
+        Account admin = new Account("admin@example.com", "adminpassword123", Account.AccountType.ADMIN);
         accountRepository.create(admin);
 
         Board board = new Board("Admin Test Board");
         boardRepository.create(board);
 
-        Post post = new Post("Admin Post content", admin.getUserId(), board.getId());
+        Post post = new Post("Admin Post content", admin.getId(), board.getId());
         postRepository.create(post);
 
         Post retrievedPost = postRepository.getById(post.getId());
         assertNotNull(retrievedPost);
         assertEquals("Admin Post content", retrievedPost.getContent());
-        assertEquals(admin.getUserId(), retrievedPost.getCreatorId());
+        assertEquals(admin.getId(), retrievedPost.getCreatorId());
         assertEquals(board.getId(), retrievedPost.getBoardId());
     }
 
     @Test
     void getById_ShouldReturnPost() {
-        Account user = new Account("user2@example.com", "password123", Account.UserType.USER);
+        Account user = new Account("user2@example.com", "password123", Account.AccountType.USER);
         accountRepository.create(user);
 
         Board board = new Board("Another Board");
         boardRepository.create(board);
 
-        Post post = new Post("Another Post content", user.getUserId(), board.getId());
+        Post post = new Post("Another Post content", user.getId(), board.getId());
         postRepository.create(post);
 
         Post retrievedPost = postRepository.getById(post.getId());
@@ -84,36 +83,36 @@ class PostRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void getAll_ShouldReturnListOfPosts() {
-        Account user = new Account("user3@example.com", "password123", Account.UserType.USER);
+        Account user = new Account("user3@example.com", "password123", Account.AccountType.USER);
         accountRepository.create(user);
 
-        Account admin = new Account("admin3@example.com", "adminpassword123", Account.UserType.ADMIN);
+        Account admin = new Account("admin3@example.com", "adminpassword123", Account.AccountType.ADMIN);
         accountRepository.create(admin);
 
         Board board = new Board("Board for Posts");
         boardRepository.create(board);
 
-        Post post1 = new Post("Post 1 content", user.getUserId(), board.getId());
-        Post post2 = new Post("Post 2 content", admin.getUserId(), board.getId());
+        Post post1 = new Post("Post 1 content", user.getId(), board.getId());
+        Post post2 = new Post("Post 2 content", admin.getId(), board.getId());
 
         postRepository.create(post1);
         postRepository.create(post2);
 
         List<Post> posts = postRepository.getAll();
         assertFalse(posts.isEmpty());
-        assertTrue(posts.stream().anyMatch(post -> post.getCreatorId().equals(user.getUserId())));
-        assertTrue(posts.stream().anyMatch(post -> post.getCreatorId().equals(admin.getUserId())));
+        assertTrue(posts.stream().anyMatch(post -> post.getCreatorId().equals(user.getId())));
+        assertTrue(posts.stream().anyMatch(post -> post.getCreatorId().equals(admin.getId())));
     }
 
     @Test
     void update_ShouldUpdatePostByUser() {
-        Account user = new Account("user4@example.com", "password123", Account.UserType.USER);
+        Account user = new Account("user4@example.com", "password123", Account.AccountType.USER);
         accountRepository.create(user);
 
         Board board = new Board("Board to Update");
         boardRepository.create(board);
 
-        Post post = new Post("Original Post content", user.getUserId(), board.getId());
+        Post post = new Post("Original Post content", user.getId(), board.getId());
         postRepository.create(post);
 
         post.setContent("Updated Post content");
@@ -125,13 +124,13 @@ class PostRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void update_ShouldUpdatePostByAdmin() {
-        Account admin = new Account("admin4@example.com", "adminpassword123", Account.UserType.ADMIN);
+        Account admin = new Account("admin4@example.com", "adminpassword123", Account.AccountType.ADMIN);
         accountRepository.create(admin);
 
         Board board = new Board("Admin Board to Update");
         boardRepository.create(board);
 
-        Post post = new Post("Original Admin Post content", admin.getUserId(), board.getId());
+        Post post = new Post("Original Admin Post content", admin.getId(), board.getId());
         postRepository.create(post);
 
         post.setContent("Updated Admin Post content");
@@ -143,13 +142,13 @@ class PostRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void delete_ShouldDeletePostByUser() {
-        Account user = new Account("user5@example.com", "password123", Account.UserType.USER);
+        Account user = new Account("user5@example.com", "password123", Account.AccountType.USER);
         accountRepository.create(user);
 
         Board board = new Board("Board to Delete");
         boardRepository.create(board);
 
-        Post post = new Post("Post to delete", user.getUserId(), board.getId());
+        Post post = new Post("Post to delete", user.getId(), board.getId());
         postRepository.create(post);
 
         postRepository.delete(post);
@@ -160,13 +159,13 @@ class PostRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void delete_ShouldDeletePostByAdmin() {
-        Account admin = new Account("admin5@example.com", "adminpassword123", Account.UserType.ADMIN);
+        Account admin = new Account("admin5@example.com", "adminpassword123", Account.AccountType.ADMIN);
         accountRepository.create(admin);
 
         Board board = new Board("Admin Board to Delete");
         boardRepository.create(board);
 
-        Post post = new Post("Admin Post to delete", admin.getUserId(), board.getId());
+        Post post = new Post("Admin Post to delete", admin.getId(), board.getId());
         postRepository.create(post);
 
         postRepository.delete(post);

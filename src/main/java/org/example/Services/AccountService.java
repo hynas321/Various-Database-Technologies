@@ -1,7 +1,7 @@
 package org.example.Services;
 
 import org.example.Entities.Account;
-import org.example.Entities.Account.UserType;
+import org.example.Entities.Account.AccountType;
 import org.example.Repositories.AccountRepository;
 import org.example.Services.Interfaces.IAccountService;
 
@@ -22,8 +22,8 @@ public class AccountService implements IAccountService {
                 return null;
             }
 
-            UserType userType = isAdmin ? UserType.ADMIN : UserType.USER;
-            Account account = new Account(email, password, userType);
+            AccountType accountType = isAdmin ? AccountType.ADMIN : AccountType.USER;
+            Account account = new Account(email, password, accountType);
             accountRepository.create(account);
 
             return account;
@@ -52,7 +52,7 @@ public class AccountService implements IAccountService {
     @Override
     public boolean updateAccount(Account account) {
         try {
-            Account existingAccount = accountRepository.getById(account.getUserId());
+            Account existingAccount = accountRepository.getById(account.getId());
             if (existingAccount == null) {
                 return false;
             }

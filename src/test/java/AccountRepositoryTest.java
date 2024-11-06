@@ -20,38 +20,38 @@ class AccountRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void create_ShouldSaveUser() {
-        Account user = new Account("test1@example.com", "password123", Account.UserType.USER);
+        Account user = new Account("test1@example.com", "password123", Account.AccountType.USER);
         accountRepository.create(user);
 
-        Account retrievedAccount = accountRepository.getById(user.getUserId());
+        Account retrievedAccount = accountRepository.getById(user.getId());
         assertNotNull(retrievedAccount);
         assertEquals("test1@example.com", retrievedAccount.getEmail());
     }
 
     @Test
     void create_ShouldSaveAdmin() {
-        Account admin = new Account("admin1@example.com", "adminpassword123", Account.UserType.ADMIN);
+        Account admin = new Account("admin1@example.com", "adminpassword123", Account.AccountType.ADMIN);
         accountRepository.create(admin);
 
-        Account retrievedAccount = accountRepository.getById(admin.getUserId());
+        Account retrievedAccount = accountRepository.getById(admin.getId());
         assertNotNull(retrievedAccount);
         assertEquals("admin1@example.com", retrievedAccount.getEmail());
     }
 
     @Test
     void getById_ShouldReturnUser() {
-        Account user = new Account("test2@example.com", "password123", Account.UserType.USER);
+        Account user = new Account("test2@example.com", "password123", Account.AccountType.USER);
         accountRepository.create(user);
 
-        Account retrievedAccount = accountRepository.getById(user.getUserId());
+        Account retrievedAccount = accountRepository.getById(user.getId());
         assertNotNull(retrievedAccount);
         assertEquals("test2@example.com", retrievedAccount.getEmail());
     }
 
     @Test
     void getAll_ShouldReturnListOfAccounts() {
-        Account user = new Account("user_1@example.com", "password123", Account.UserType.USER);
-        Account admin = new Account("admin_1@example.com", "adminpassword123", Account.UserType.ADMIN);
+        Account user = new Account("user_1@example.com", "password123", Account.AccountType.USER);
+        Account admin = new Account("admin_1@example.com", "adminpassword123", Account.AccountType.ADMIN);
 
         accountRepository.create(user);
         accountRepository.create(admin);
@@ -62,24 +62,24 @@ class AccountRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void update_ShouldUpdateUser() {
-        Account user = new Account("update@example.com", "password123", Account.UserType.USER);
+        Account user = new Account("update@example.com", "password123", Account.AccountType.USER);
         accountRepository.create(user);
 
         user.setEmail("updated_user@example.com");
         accountRepository.update(user);
 
-        Account updatedAccount = accountRepository.getById(user.getUserId());
+        Account updatedAccount = accountRepository.getById(user.getId());
         assertEquals("updated_user@example.com", updatedAccount.getEmail());
     }
 
     @Test
     void delete_ShouldDeleteUser() {
-        Account user = new Account("delete_user@example.com", "password123", Account.UserType.USER);
+        Account user = new Account("delete_user@example.com", "password123", Account.AccountType.USER);
         accountRepository.create(user);
 
         accountRepository.delete(user);
 
-        Account deletedAccount = accountRepository.getById(user.getUserId());
+        Account deletedAccount = accountRepository.getById(user.getId());
         assertNull(deletedAccount);
     }
 }

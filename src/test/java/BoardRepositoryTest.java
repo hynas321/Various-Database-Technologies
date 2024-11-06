@@ -37,7 +37,7 @@ class BoardRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void create_ShouldSaveBoardByUser() {
-        Account user = new Account("user1@example.com", "password123", Account.UserType.USER);
+        Account user = new Account("user1@example.com", "password123", Account.AccountType.USER);
         accountRepository.create(user);
 
         Board board = new Board("User's Test Board");
@@ -50,7 +50,7 @@ class BoardRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void create_ShouldSaveBoardByAdmin() {
-        Account admin = new Account("admin_unique1@example.com", "adminpassword123", Account.UserType.ADMIN);
+        Account admin = new Account("admin_unique1@example.com", "adminpassword123", Account.AccountType.ADMIN);
         accountRepository.create(admin);
 
         Board board = new Board("Admin's Test Board");
@@ -108,11 +108,11 @@ class BoardRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void create_ShouldSaveBoardWithPostsByUser() {
-        Account user = new Account("user_unique2@example.com", "password123", Account.UserType.USER);
+        Account user = new Account("user_unique2@example.com", "password123", Account.AccountType.USER);
         accountRepository.create(user);
 
         Board board = new Board("Board with Posts");
-        Post post = new Post("Post in Board", user.getUserId(), board.getId());
+        Post post = new Post("Post in Board", user.getId(), board.getId());
         board.getPostIds().add(post.getId());
 
         boardRepository.create(board);
@@ -124,11 +124,11 @@ class BoardRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void create_ShouldSaveBoardWithPostsByAdmin() {
-        Account admin = new Account("admin_unique2@example.com", "adminpassword123", Account.UserType.ADMIN);
+        Account admin = new Account("admin_unique2@example.com", "adminpassword123", Account.AccountType.ADMIN);
         accountRepository.create(admin);
 
         Board board = new Board("Admin Board with Posts");
-        Post post = new Post("Admin Post in Board", admin.getUserId(), board.getId());
+        Post post = new Post("Admin Post in Board", admin.getId(), board.getId());
         board.getPostIds().add(post.getId());
 
         boardRepository.create(board);

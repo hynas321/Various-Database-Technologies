@@ -51,10 +51,10 @@ public class AccountRepository implements EntityRepository<Account> {
     private static void setTables(CqlSession session, CqlIdentifier keyspace) {
         session.execute(SchemaBuilder.createTable(keyspace, CqlIdentifier.fromCql("accounts"))
                 .ifNotExists()
-                .withPartitionKey(CqlIdentifier.fromCql("userId"), DataTypes.UUID)
+                .withPartitionKey(CqlIdentifier.fromCql("id"), DataTypes.UUID)
                 .withColumn(CqlIdentifier.fromCql("email"), DataTypes.TEXT)
                 .withColumn(CqlIdentifier.fromCql("password"), DataTypes.TEXT)
-                .withClusteringColumn(CqlIdentifier.fromCql("user_type"), DataTypes.TEXT)
+                .withColumn(CqlIdentifier.fromCql("type"), DataTypes.TEXT)
                 .withColumn(CqlIdentifier.fromCql("post_ids"), DataTypes.setOf(DataTypes.UUID))
                 .withColumn(CqlIdentifier.fromCql("board_ids"), DataTypes.setOf(DataTypes.UUID))
                 .build());

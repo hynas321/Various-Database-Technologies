@@ -9,12 +9,12 @@ import java.util.UUID;
 @CqlName("accounts")
 public class Account {
 
-    public enum UserType {
+    public enum AccountType {
         USER, ADMIN
     }
 
     @PartitionKey
-    private UUID userId;
+    private UUID id;
 
     @CqlName("email")
     private String email;
@@ -23,7 +23,7 @@ public class Account {
 
     @ClusteringColumn
     @CqlName("type")
-    private String userType;
+    private String type;
 
     @CqlName("post_ids")
     private Set<UUID> postIds = new HashSet<>();
@@ -35,18 +35,19 @@ public class Account {
 
     }
 
-    public Account(String email, String password, UserType userType) {
+    public Account(String email, String password, AccountType type) {
+        this.id = UUID.randomUUID();
         this.email = email;
         this.password = password;
-        this.userType = userType.name();
+        this.type = type.name();
     }
 
-    public UUID getUserId() {
-        return userId;
+    public UUID getId() {
+        return id;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getEmail() {
@@ -65,12 +66,12 @@ public class Account {
         this.password = password;
     }
 
-    public String getUserType() {
-        return userType;
+    public String getType() {
+        return type;
     }
 
-    public void setUserType(UserType userType) {
-        this.userType = userType.name();
+    public void setType(AccountType type) {
+        this.type = type.name();
     }
 
     public Set<UUID> getPostIds() {

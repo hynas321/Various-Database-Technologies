@@ -36,7 +36,7 @@ public class BoardService implements IBoardService {
             Account account = accountRepository.getById(userId);
 
             if (board == null || account == null ||
-                    (!account.getUserType().equals("ADMIN") && !board.getMemberIds().contains(userId))) {
+                    (!account.getType().equals("ADMIN") && !board.getMemberIds().contains(userId))) {
                 return false;
             }
 

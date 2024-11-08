@@ -17,10 +17,6 @@ public interface AccountDao {
     @Select
     Account getById(UUID id);
 
-    @StatementAttributes(consistencyLevel = "ONE")
-    @Query("SELECT * FROM accounts")
-    List<Account> getAll();
-
     @StatementAttributes(consistencyLevel = "QUORUM")
     @Update
     void update(Account account);

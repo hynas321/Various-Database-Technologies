@@ -2,25 +2,31 @@ package org.example.Repositories;
 
 import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.core.type.DataTypes;
 import com.datastax.oss.driver.api.querybuilder.SchemaBuilder;
 import org.example.Dao.BoardDao;
+import org.example.Entities.Account;
 import org.example.Entities.Board;
 import org.example.Mappers.RepositoryMapper;
 import org.example.Mappers.RepositoryMapperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class BoardRepository implements EntityRepository<Board> {
 
     private final BoardDao boardDao;
+    private final CqlSession session;
 
     public BoardRepository(CqlSession session, CqlIdentifier keyspace) {
         setTables(session, keyspace);
 
         RepositoryMapper repositoryMapper = new RepositoryMapperBuilder(session).build();;
         this.boardDao = repositoryMapper.boardDao(keyspace);
+        this.session = session;
     }
 
     @Override
@@ -35,7 +41,24 @@ public class BoardRepository implements EntityRepository<Board> {
 
     @Override
     public List<Board> getAll() {
-        return boardDao.getAll();
+        SimpleStatement stmt = SimpleStatement.builder("SELECT * FROM boards")
+                .setPageSize(100)
+                .build();
+        ResultSet rs = session.execute(stmt);
+
+        List<Board> boards = new ArrayList<>();
+
+        rs.forEach(row -> {
+            Board board = new Board(
+                    row.getUuid("id"),
+                    row.getString("name"),
+                    row.getSet("post_ids", UUID.class),
+                    row.getSet("member_ids", UUID.class)
+            );
+            boards.add(board);
+        });
+
+        return boards;
     }
 
     @Override

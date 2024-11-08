@@ -16,10 +16,6 @@ public interface BoardDao {
     @Select
     Board getById(UUID id);
 
-    @StatementAttributes(consistencyLevel = "ONE")
-    @Query("SELECT * FROM boards")
-    List<Board> getAll();
-
     @StatementAttributes(consistencyLevel = "QUORUM")
     @Update
     void update(Board board);

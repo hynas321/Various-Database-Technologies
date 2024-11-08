@@ -16,10 +16,6 @@ public interface PostDao {
     @Select
     Post getById(UUID id);
 
-    @StatementAttributes(consistencyLevel = "ONE")
-    @Query("SELECT * FROM posts")
-    List<Post> getAll();
-
     @StatementAttributes(consistencyLevel = "QUORUM")
     @Update
     void update(Post post);

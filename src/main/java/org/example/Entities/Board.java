@@ -30,6 +30,13 @@ public class Board {
         this.name = name;
     }
 
+    public Board(UUID id, String name, Set<UUID> postIds, Set<UUID> memberIds) {
+        this.id = id;
+        this.name = name;
+        this.postIds = postIds;
+        this.memberIds = memberIds;
+    }
+
     public UUID getId() {
         return id;
     }

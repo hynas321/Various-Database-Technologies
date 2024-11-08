@@ -35,6 +35,14 @@ public class Post {
         this.boardId = boardId;
     }
 
+    public Post(UUID id, String content, UUID creatorId, UUID boardId, Set<UUID> commentIds) {
+        this.id = id;
+        this.content = content;
+        this.creatorId = creatorId;
+        this.boardId = boardId;
+        this.commentIds = commentIds;
+    }
+
     public UUID getId() {
         return id;
     }

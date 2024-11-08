@@ -30,6 +30,13 @@ public class Comment {
         this.creatorId = creatorId;
     }
 
+    public Comment(UUID id, String content, UUID postId, UUID creatorId) {
+        this.id = id;
+        this.content = content;
+        this.postId = postId;
+        this.creatorId = creatorId;
+    }
+
     public UUID getId() {
         return id;
     }

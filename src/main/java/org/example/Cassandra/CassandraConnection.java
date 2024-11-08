@@ -11,25 +11,10 @@ import com.datastax.oss.driver.api.querybuilder.schema.CreateKeyspace;
 import java.net.InetSocketAddress;
 
 public class CassandraConnection {
-    private static CassandraConnection instance;
     private final CqlSession session;
 
     public CassandraConnection(String dataCenter) {
         AuthProvider authProvider = new ProgrammaticPlainTextAuthProvider("cassandra", "cassandra");
-        try (CqlSession sessionWithoutKeyspace = CqlSession.builder()
-                .withAuthProvider(authProvider)
-                .addContactPoint(new InetSocketAddress("cassandra1", 9042))
-                .addContactPoint(new InetSocketAddress("cassandra2", 9043))
-                .withLocalDatacenter(dataCenter)
-                .build()) {
-
-            CreateKeyspace keyspace = SchemaBuilder.createKeyspace(CqlIdentifier.fromCql("site"))
-                    .ifNotExists()
-                    .withSimpleStrategy(2)
-                    .withDurableWrites(true);
-            SimpleStatement createKeySpaceStatement = keyspace.build();
-            sessionWithoutKeyspace.execute(createKeySpaceStatement);
-        }
 
         this.session = CqlSession.builder()
                 .withAuthProvider(authProvider)
@@ -38,6 +23,14 @@ public class CassandraConnection {
                 .withLocalDatacenter(dataCenter)
                 .withKeyspace(CqlIdentifier.fromCql("site"))
                 .build();
+
+        CreateKeyspace keyspace = SchemaBuilder.createKeyspace(CqlIdentifier.fromCql("site"))
+                .ifNotExists()
+                .withSimpleStrategy(2)
+                .withDurableWrites(true);
+        SimpleStatement createKeySpaceStatement = keyspace.build();
+
+        session.execute(createKeySpaceStatement);
     }
 
     public CqlSession getSession() {

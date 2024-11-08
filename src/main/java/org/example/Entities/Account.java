@@ -42,6 +42,16 @@ public class Account {
         this.type = type.name();
     }
 
+    public Account(UUID id, String email, String password, String type,
+                   Set<UUID> postIds, Set<UUID> boardIds) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.type = type;
+        this.postIds = postIds;
+        this.boardIds = boardIds;
+    }
+
     public UUID getId() {
         return id;
     }

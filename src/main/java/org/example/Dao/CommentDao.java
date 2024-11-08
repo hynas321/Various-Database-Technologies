@@ -16,10 +16,6 @@ public interface CommentDao {
     @Select
     Comment getById(UUID id);
 
-    @StatementAttributes(consistencyLevel = "ONE")
-    @Query("SELECT * FROM comments")
-    List<Comment> getAll();
-
     @StatementAttributes(consistencyLevel = "QUORUM")
     @Update
     void update(Comment comment);

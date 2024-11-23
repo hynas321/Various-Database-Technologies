@@ -26,10 +26,10 @@ public class RedisCache {
 
         this.jedis = new Jedis(uri);
         this.jedis.auth(password);
+
+        //
         this.objectMapper = new ObjectMapper();
-
         SimpleModule module = new SimpleModule();
-
         module.addSerializer(ObjectId.class, new ObjectIdSerializer());
         module.addDeserializer(ObjectId.class, new ObjectIdDeserializer());
         objectMapper.registerModule(module);
@@ -60,21 +60,6 @@ public class RedisCache {
             }
 
             return objectMapper.readValue(jsonData, type);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public <T> List<T> getCachedDataAsList(String key, Class<T> type) {
-        try {
-            String jsonData = jedis.get(key);
-            if (jsonData == null) {
-                return null;
-            }
-
-            JavaType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, type);
-            return objectMapper.readValue(jsonData, listType);
         } catch (IOException e) {
             e.printStackTrace();
             return null;

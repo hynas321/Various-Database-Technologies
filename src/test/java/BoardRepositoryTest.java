@@ -24,7 +24,7 @@ class BoardRepositoryTest extends BaseRepositoryTest {
     public void setUp() {
         super.setUp();
         accountRepository = new AccountRepository(database);
-        boardRepository = new RedisBoardDecorator(new BoardRepository(database), redisCache);
+        boardRepository = new BoardRepository(database);
     }
 
     @Test

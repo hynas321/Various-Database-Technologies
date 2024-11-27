@@ -10,7 +10,7 @@ public class RedisBoardDecorator implements EntityRepository<Board> {
     private final EntityRepository<Board> wrappedRepository;
     private final RedisCache redisCache;
     private static final int CACHE_EXPIRATION = 1800;
-    private static final String BOARD_CACHE_KEY = "boards";
+    private static final String BOARD_CACHE_KEY = "board:";
 
     public RedisBoardDecorator(EntityRepository<Board> wrappedRepository, RedisCache redisCache) {
         this.wrappedRepository = wrappedRepository;
@@ -20,15 +20,13 @@ public class RedisBoardDecorator implements EntityRepository<Board> {
     @Override
     public void create(Board board) {
         wrappedRepository.create(board);
-        cacheBoard(board);
-        redisCache.deleteCache(BOARD_CACHE_KEY);
+        redisCache.cacheData(BOARD_CACHE_KEY + board.getId().toString(), board, CACHE_EXPIRATION);
     }
 
     @Override
     public Board getById(ObjectId id) {
-        String cacheKey = "board:" + id.toString();
         if (redisCache.isConnected()) {
-            Board cachedBoard = redisCache.getCachedData(cacheKey, Board.class);
+            Board cachedBoard = redisCache.getCachedData(BOARD_CACHE_KEY + id.toString(), Board.class);
             if (cachedBoard != null) {
                 return cachedBoard;
             }
@@ -36,46 +34,28 @@ public class RedisBoardDecorator implements EntityRepository<Board> {
 
         Board board = wrappedRepository.getById(id);
         if (board != null && redisCache.isConnected()) {
-            cacheBoard(board);
+            redisCache.cacheData(BOARD_CACHE_KEY + board.getId().toString(), board, CACHE_EXPIRATION);
         }
 
         return board;
     }
 
     @Override
-    public List<Board> getAll() {
-        if (redisCache.isConnected()) {
-            List<Board> cachedBoards = redisCache.getCachedDataAsList(BOARD_CACHE_KEY, Board.class);
-            if (cachedBoards != null) {
-                return cachedBoards;
-            }
-        }
-
-        List<Board> boards = wrappedRepository.getAll();
-        if (!boards.isEmpty() && redisCache.isConnected()) {
-            redisCache.cacheData(BOARD_CACHE_KEY, boards, CACHE_EXPIRATION);
-        }
-
-        return boards;
-    }
-
-    @Override
     public void update(Board board) {
         wrappedRepository.update(board);
-        cacheBoard(board);
-        redisCache.deleteCache(BOARD_CACHE_KEY);
+        redisCache.deleteCache(BOARD_CACHE_KEY + board.getId());
+        redisCache.cacheData(BOARD_CACHE_KEY + board.getId().toString(), board, CACHE_EXPIRATION);
     }
 
     @Override
     public void delete(Board board) {
         wrappedRepository.delete(board);
-        String cacheKey = "board:" + board.getId().toString();
-        redisCache.deleteCache(cacheKey);
-        redisCache.deleteCache(BOARD_CACHE_KEY);
+        redisCache.deleteCache(BOARD_CACHE_KEY + board.getId().toString());
     }
 
-    private void cacheBoard(Board board) {
-        String cacheKey = "board:" + board.getId().toString();
-        redisCache.cacheData(cacheKey, board, CACHE_EXPIRATION);
+    @Override
+    public List<Board> getAll() {
+        //Brak implementacji
+        return null;
     }
 }

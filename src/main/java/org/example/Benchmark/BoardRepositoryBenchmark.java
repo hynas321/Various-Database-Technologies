@@ -9,32 +9,37 @@ import org.example.Repositories.EntityRepository;
 import org.example.Repositories.MongoDbConnection;
 import org.openjdk.jmh.annotations.*;
 
-@BenchmarkMode(Mode.AverageTime)
+@BenchmarkMode(Mode.SampleTime)
+@Warmup(iterations = 2)
+@Measurement(iterations = 2)
+@Fork(1)
 @State(Scope.Benchmark)
 public class BoardRepositoryBenchmark {
 
-    private EntityRepository<Board> boardRepository;
+    private EntityRepository<Board> boardRepositoryWithCache;
     private RedisCache redisCache;
-    private ObjectId testBoardId;
+    private Board board;
 
     @Setup
     public void setUp() {
         MongoDbConnection mongoDbConnection = new MongoDbConnection("mongodb://mongodb1:27017,mongodb2:27018,mongodb3:27019/?replicaSet=replica_set_single", "testDatabase");
         redisCache = new RedisCache();
-        boardRepository = new RedisBoardDecorator(new BoardRepository(mongoDbConnection.getDatabase()), redisCache);
+        boardRepositoryWithCache = new RedisBoardDecorator(new BoardRepository(mongoDbConnection.getDatabase()), redisCache);
 
-        testBoardId = new ObjectId("123");
-        boardRepository.getById(testBoardId);
+        board = new Board();
+        board.setId(new ObjectId());
+
+        boardRepositoryWithCache.getById(board.getId());
     }
 
     @Benchmark
     public void testCacheExists() {
-        boardRepository.getById(testBoardId);
+        boardRepositoryWithCache.getById(board.getId());
     }
 
     @Benchmark
     public void testCacheDoesNotExist() {
-        redisCache.deleteCache("board:" + testBoardId.toString());
-        boardRepository.getById(testBoardId);
+        redisCache.deleteCache("board:" + board.getId().toString());
+        boardRepositoryWithCache.getById(board.getId());
     }
 }

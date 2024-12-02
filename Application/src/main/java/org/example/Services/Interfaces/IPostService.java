@@ -4,7 +4,6 @@ import org.bson.types.ObjectId;
 import org.example.Entities.Post;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface IPostService {
     Post createPost(ObjectId userId, ObjectId boardId, String content);

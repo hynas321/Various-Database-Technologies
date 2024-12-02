@@ -4,7 +4,6 @@ import org.bson.types.ObjectId;
 import org.example.Entities.Account;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface IAccountService {
     Account createAccount(String email, String password, boolean isAdmin);

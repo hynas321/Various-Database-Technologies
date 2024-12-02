@@ -4,7 +4,6 @@ import org.bson.types.ObjectId;
 import org.example.Entities.Board;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface IBoardService {
     Board createBoard(String name);

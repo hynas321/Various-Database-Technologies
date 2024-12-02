@@ -4,7 +4,6 @@ import org.bson.types.ObjectId;
 import org.example.Entities.Comment;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ICommentService {
     Comment addComment(ObjectId postId, ObjectId userId, String content);

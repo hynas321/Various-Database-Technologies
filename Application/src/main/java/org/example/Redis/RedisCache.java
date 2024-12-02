@@ -1,6 +1,5 @@
 package org.example.Redis;
 
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -9,10 +8,8 @@ import org.example.Entities.Admin;
 import org.example.Entities.User;
 import redis.clients.jedis.Jedis;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Properties;
 
 public class RedisCache {

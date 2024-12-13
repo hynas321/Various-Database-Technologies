@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@Entity
+@Entity(defaultKeyspace = "site")
 @CqlName("boards")
 public class Board {
 

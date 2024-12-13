@@ -3,7 +3,7 @@ package org.example.Entities;
 import com.datastax.oss.driver.api.mapper.annotations.*;
 import java.util.UUID;
 
-@Entity
+@Entity(defaultKeyspace = "site")
 @CqlName("comments")
 public class Comment {
 

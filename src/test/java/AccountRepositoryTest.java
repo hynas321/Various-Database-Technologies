@@ -2,6 +2,7 @@ import com.datastax.oss.driver.api.core.CqlIdentifier;
 import org.example.Entities.Account;
 import org.example.Repositories.AccountRepository;
 import org.example.Repositories.EntityRepository;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AccountRepositoryTest extends BaseRepositoryTest {
     private EntityRepository<Account> accountRepository;
 
-    @BeforeEach
+    @BeforeAll
     public void setUp() {
         super.setUp();
         accountRepository = new AccountRepository(session, CqlIdentifier.fromCql("site"));

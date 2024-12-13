@@ -6,14 +6,13 @@ import com.datastax.oss.driver.api.core.auth.AuthProvider;
 import com.datastax.oss.driver.api.core.auth.ProgrammaticPlainTextAuthProvider;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.querybuilder.SchemaBuilder;
-import com.datastax.oss.driver.api.querybuilder.schema.CreateKeyspace;
 
 import java.net.InetSocketAddress;
 
 public class CassandraConnection {
-    private final CqlSession session;
+    private CqlSession session;
 
-    public CassandraConnection(String dataCenter) {
+    public CassandraConnection(String dataCenter, String keyspace) {
         AuthProvider authProvider = new ProgrammaticPlainTextAuthProvider("cassandra", "cassandra");
 
         this.session = CqlSession.builder()
@@ -21,16 +20,28 @@ public class CassandraConnection {
                 .addContactPoint(new InetSocketAddress("cassandra1", 9042))
                 .addContactPoint(new InetSocketAddress("cassandra2", 9043))
                 .withLocalDatacenter(dataCenter)
-                .withKeyspace(CqlIdentifier.fromCql("site"))
                 .build();
 
-        CreateKeyspace keyspace = SchemaBuilder.createKeyspace(CqlIdentifier.fromCql("site"))
+        createKeyspaceIfNotExists(keyspace);
+
+        this.session.close();
+        this.session = CqlSession.builder()
+                .withAuthProvider(authProvider)
+                .addContactPoint(new InetSocketAddress("cassandra1", 9042))
+                .addContactPoint(new InetSocketAddress("cassandra2", 9043))
+                .withLocalDatacenter(dataCenter)
+                .withKeyspace(CqlIdentifier.fromCql(keyspace))
+                .build();
+    }
+
+    private void createKeyspaceIfNotExists(String keyspace) {
+        SimpleStatement keyspaceStatement = SchemaBuilder.createKeyspace(CqlIdentifier.fromCql(keyspace))
                 .ifNotExists()
                 .withSimpleStrategy(2)
-                .withDurableWrites(true);
-        SimpleStatement createKeySpaceStatement = keyspace.build();
+                .withDurableWrites(true)
+                .build();
 
-        session.execute(createKeySpaceStatement);
+        session.execute(keyspaceStatement);
     }
 
     public CqlSession getSession() {

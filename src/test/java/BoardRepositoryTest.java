@@ -5,6 +5,7 @@ import org.example.Entities.Account;
 import org.example.Repositories.BoardRepository;
 import org.example.Repositories.EntityRepository;
 import org.example.Repositories.AccountRepository;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +18,7 @@ class BoardRepositoryTest extends BaseRepositoryTest {
     private EntityRepository<Board> boardRepository;
     private EntityRepository<Account> accountRepository;
 
-    @BeforeEach
+    @BeforeAll
     @Override
     public void setUp() {
         super.setUp();

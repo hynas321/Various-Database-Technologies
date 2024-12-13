@@ -8,6 +8,7 @@ import org.example.Repositories.CommentRepository;
 import org.example.Repositories.EntityRepository;
 import org.example.Repositories.PostRepository;
 import org.example.Repositories.AccountRepository;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +23,7 @@ class CommentRepositoryTest extends BaseRepositoryTest {
     private EntityRepository<Post> postRepository;
     private EntityRepository<Board> boardRepository;
 
-    @BeforeEach
+    @BeforeAll
     @Override
     public void setUp() {
         super.setUp();

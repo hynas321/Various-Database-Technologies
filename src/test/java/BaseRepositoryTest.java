@@ -9,7 +9,7 @@ public abstract class BaseRepositoryTest {
 
     @BeforeAll
     public void setUp() {
-        cassandraConnection = new CassandraConnection("dc1");
+        cassandraConnection = new CassandraConnection("dc1", "site");
         session = cassandraConnection.getSession();
     }
 

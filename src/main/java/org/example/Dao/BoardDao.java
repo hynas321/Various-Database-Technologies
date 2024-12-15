@@ -2,7 +2,6 @@ package org.example.Dao;
 
 import com.datastax.oss.driver.api.mapper.annotations.*;
 import org.example.Entities.Board;
-import java.util.List;
 import java.util.UUID;
 
 @Dao

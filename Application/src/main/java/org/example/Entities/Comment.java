@@ -68,4 +68,14 @@ public class Comment {
     public void setCreatorId(ObjectId creatorId) {
         this.creatorId = creatorId;
     }
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "id=" + id +
+                ", content='" + content + '\'' +
+                ", postId=" + postId +
+                ", creatorId=" + creatorId +
+                '}';
+    }
 }

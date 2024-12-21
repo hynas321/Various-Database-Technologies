@@ -88,4 +88,15 @@ public abstract class Account {
     public void setBoardIds(Set<ObjectId> boardIds) {
         this.boardIds = boardIds;
     }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", accountPassword='" + accountPassword + '\'' +
+                ", postIds=" + postIds +
+                ", boardIds=" + boardIds +
+                '}';
+    }
 }

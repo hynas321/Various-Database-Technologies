@@ -66,4 +66,14 @@ public class Board {
     public void setMemberIds(Set<ObjectId> memberIds) {
         this.memberIds = memberIds;
     }
+
+    @Override
+    public String toString() {
+        return "Board{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", postIds=" + postIds +
+                ", memberIds=" + memberIds +
+                '}';
+    }
 }

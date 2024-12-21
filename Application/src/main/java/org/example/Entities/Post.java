@@ -82,4 +82,15 @@ public class Post {
     public void setCommentIds(Set<ObjectId> commentIds) {
         this.commentIds = commentIds;
     }
+
+    @Override
+    public String toString() {
+        return "Post{" +
+                "id=" + id +
+                ", content='" + content + '\'' +
+                ", creatorId=" + creatorId +
+                ", boardId=" + boardId +
+                ", commentIds=" + commentIds +
+                '}';
+    }
 }

@@ -1,24 +1,27 @@
 package org.example;
 
 import com.mongodb.client.MongoDatabase;
-import org.example.Entities.Board;
+import org.example.Entities.Post;
 import org.example.Kafka.KafkaConsumerService;
-import org.example.Repositories.BoardRepository;
 import org.example.Repositories.EntityRepository;
 import org.example.Repositories.MongoDbConnection;
+import org.example.Repositories.PostRepository;
 
 public class Main {
-    private MongoDbConnection mongoDbConnection;
-    private MongoDatabase database;
-    private KafkaConsumerService<Board> consumerService;
-    private EntityRepository<Board> boardRepository;
 
-    public void main(String[] args) {
-        mongoDbConnection = new MongoDbConnection("mongodb://mongodb1:27017,mongodb2:27018,mongodb3:27019/?replicaSet=replica_set_single", "testDatabase");
-        database = mongoDbConnection.getDatabase();
-        boardRepository = new BoardRepository(database);
-        consumerService = new KafkaConsumerService<>(boardRepository, "topic");
+    public static void main(String[] args) {
+        MongoDbConnection mongoDbConnection = new MongoDbConnection("mongodb://mongodb1:27017,mongodb2:27018,mongodb3:27019/?replicaSet=replica_set_single", "testDatabase");
+        MongoDatabase database = mongoDbConnection.getDatabase();
+        EntityRepository<Post> postRepository = new PostRepository(database);
 
-        consumerService.consume(Board.class);
+        KafkaConsumerService<Post> consumerService = new KafkaConsumerService<>(postRepository, "social-site");
+
+        Runtime.getRuntime().addShutdownHook(new Thread(consumerService::close));
+
+        System.out.println("Listening for incoming messages...");
+
+        while (true) {
+            consumerService.consume(Post.class);
+        }
     }
 }

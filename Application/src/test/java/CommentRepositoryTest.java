@@ -5,11 +5,7 @@ import org.example.Entities.Account;
 import org.example.Entities.User;
 import org.example.Entities.Admin;
 import org.example.Redis.RedisBoardDecorator;
-import org.example.Repositories.BoardRepository;
-import org.example.Repositories.CommentRepository;
-import org.example.Repositories.EntityRepository;
-import org.example.Repositories.PostRepository;
-import org.example.Repositories.AccountRepository;
+import org.example.Repositories.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
